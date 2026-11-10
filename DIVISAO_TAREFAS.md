@@ -54,13 +54,15 @@ Os arquivos obrigatórios do App Router e `src/middleware.ts` em `base(tempval)/
 
 ## 3. Frentes de trabalho
 
-| Frente | Responsável | Responsabilidade |
+| Frente | Equipe / Papel | Responsabilidade |
 |---|---|---|
-| 1 | Elliot, Tech Lead | Arquitetura, setup, banco, autenticação, sessão, troca de senha, bloqueio desktop e RBAC |
-| 2 | Luana | UI/UX, design system, telas mobile, login, primeiro acesso e interface de chat |
-| 3 | Pedro | Conversas, mensagens de texto em tempo real e confirmação de leitura |
-| 4 | Mariana | Painel Admin TI, gestão de contas, implantação gradual, e-mail, auditoria e upload seguro de PDF |
-| 5 | Ícaro | QA, testes de aceitação, validação das regras de negócio, README e matriz de rastreabilidade |
+| 1 | Elliot (Tech Lead) | Arquitetura, setup, banco, autenticação, sessão, troca de senha, bloqueio desktop e RBAC |
+| 2 | Luana e Gilson (Design UI/UX) | Design system, telas mobile, login, primeiro acesso e interface de chat |
+| 3 | Pedro, Luan e Diego (Desenvolvimento) | Conversas, mensagens de texto em tempo real, integrações e confirmação de leitura |
+| 4 | Pedro, Luan e Diego (Desenvolvimento); Mariana (SQA) | Implementação e validação do Painel Admin TI, gestão de contas, implantação gradual, e-mail, auditoria e upload seguro de PDF |
+| 5 | Ícaro (PO, requisitos e docs); Mariana (SQA) | Critérios de aceite, testes de qualidade, validação das regras, README e matriz de rastreabilidade |
+
+**Distribuição:** Pedro, Luan e Diego compõem a equipe de desenvolvimento; a repartição individual das atividades será acordada durante as sprints. Luana e Gilson compartilham o design. Ícaro é PO e Mariana é analista de SQA. As identificações são nominais, sem presumir contas GitHub.
 
 ## 4. Quadro de Issues
 
@@ -69,141 +71,141 @@ Cada Issue representa uma entrega verificável, planejada para 1 a 3 dias. As pe
 ### Frente 1: Elliot, Tech Lead, Arquitetura, Auth e Segurança
 
 #### [ISSUE-01] Configurar repositório, ambiente e modelo inicial do banco (Responsável: Elliot)
-- **Frente / Responsável:** Frente 1, Elliot.
+- **Frente / Responsável:** Frente 1, Elliot (Tech Lead).
 - **Prioridade / Sprint:** Fase 1: Fundação.
 - **Requisitos atendidos:** RF03, RF04, RF08, RF13, RF15, RN01, RN02, RN05, RN09, RN10, RNF09, RNF13, SEG01.
 - **O que fazer:** Configurar Next.js, TypeScript, Supabase e variáveis de ambiente. Criar migrations para usuários, grupos de liberação, conversas, participantes, mensagens, leituras e auditoria.
 - **Critério de Pronto (DoD):** Ambiente local sobe e migrations criam as tabelas e relacionamentos previstos em banco de desenvolvimento.
 
 #### [ISSUE-02] Implementar autenticação individual e sessão segura (Responsável: Elliot)
-- **Frente / Responsável:** Frente 1, Elliot.
+- **Frente / Responsável:** Frente 1, Elliot (Tech Lead).
 - **Prioridade / Sprint:** Fase 1: Fundação.
 - **Requisitos atendidos:** RF03, RF07, RN03, RNF05, RNF06, SEG01, SEG02, SEG03, SEG06.
 - **O que fazer:** Implementar login individual e sessão com HTTPS, cookies/tokens protegidos, expiração e encerramento. Usar hash de senha com salt por meio do mecanismo seguro de autenticação, sem persistir senha em texto puro.
 - **Critério de Pronto (DoD):** Testes comprovam login individual, armazenamento não reversível de senha, transporte HTTPS e expiração/encerramento de sessão.
 
 #### [ISSUE-03] Exigir troca de senha provisória no primeiro acesso (Responsável: Elliot)
-- **Frente / Responsável:** Frente 1, Elliot.
+- **Frente / Responsável:** Frente 1, Elliot (Tech Lead).
 - **Prioridade / Sprint:** Fase 1: Fundação.
 - **Requisitos atendidos:** RF06, RN04, RN03, RNF05, RNF06, SEG01, SEG02, SEG06.
 - **O que fazer:** Implementar estado de primeiro acesso e rota protegida de troca de senha. Bloquear consultas e operações do chat enquanto a senha provisória não tiver sido substituída.
 - **Critério de Pronto (DoD):** Conta com senha provisória só alcança o chat depois de concluir a troca e renovar a sessão conforme a política.
 
 #### [ISSUE-04] Bloquear acesso desktop e aplicar RBAC no servidor (Responsável: Elliot)
-- **Frente / Responsável:** Frente 1, Elliot.
+- **Frente / Responsável:** Frente 1, Elliot (Tech Lead).
 - **Prioridade / Sprint:** Fase 1: Fundação.
 - **Requisitos atendidos:** RF01, RF02, RF13, RF14, RN05, RNF01, RNF02, RNF03, RNF04, RNF07, RNF14, SEG03, SEG04.
 - **O que fazer:** Implementar bloqueio técnico de desktop/notebook e permitir os navegadores móveis definidos. Aplicar autorização server-side para Admin TI e Funcionário em todas as rotas e operações protegidas.
 - **Critério de Pronto (DoD):** Chrome Android e Safari iOS passam, desktop é bloqueado e chamadas diretas de funcionário a recursos administrativos retornam acesso negado.
 
-### Frente 2: Luana, UI/UX, Design System e Telas Mobile
+### Frente 2: Luana e Gilson, UI/UX, Design System e Telas Mobile
 
-#### [ISSUE-05] Criar design system e navegação mobile-first (Responsável: Luana)
-- **Frente / Responsável:** Frente 2, Luana.
+#### [ISSUE-05] Criar design system e navegação mobile-first (Responsáveis: Luana e Gilson)
+- **Frente / Responsáveis:** Frente 2, Luana e Gilson (Design UI/UX).
 - **Prioridade / Sprint:** Fase 1: Fundação.
 - **Requisitos atendidos:** RF01, RF02, RNF01, RNF03, RNF04, RNF14.
 - **O que fazer:** Criar tokens de cor, tipografia, espaçamento, botões, campos e navegação conforme a identidade visual fornecida pela empresa. Estruturar layout mobile-first inspirado em aplicativos de mensagens.
 - **Critério de Pronto (DoD):** Componentes e layout são navegáveis em viewport de smartphone e seguem os tokens aprovados.
 
-#### [ISSUE-06] Desenvolver telas de login e primeiro acesso (Responsável: Luana)
-- **Frente / Responsável:** Frente 2, Luana.
+#### [ISSUE-06] Desenvolver telas de login e primeiro acesso (Responsáveis: Luana e Gilson)
+- **Frente / Responsáveis:** Frente 2, Luana e Gilson (Design UI/UX).
 - **Prioridade / Sprint:** Fase 1: Fundação.
 - **Requisitos atendidos:** RF03, RF06, RF07, RN03, RN04, RNF04, RNF14, SEG01, SEG06.
 - **O que fazer:** Construir telas de login e troca obrigatória de senha, com autocomplete e atributos compatíveis com gerenciadores de senha. Integrar aos estados e rotas de autenticação definidos por Elliot.
 - **Critério de Pronto (DoD):** Fluxo visual de login e primeiro acesso funciona em Chrome Android e Safari iOS sem permitir avançar antes da troca obrigatória.
 
-#### [ISSUE-07] Desenvolver interface de conversas e mensagens (Responsável: Luana)
-- **Frente / Responsável:** Frente 2, Luana.
+#### [ISSUE-07] Desenvolver interface de conversas e mensagens (Responsáveis: Luana e Gilson)
+- **Frente / Responsáveis:** Frente 2, Luana e Gilson (Design UI/UX).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF08, RF09, RF10, RN08, RNF01, RNF04, RNF08, RNF12.
 - **O que fazer:** Construir lista de conversas, cabeçalho, histórico, balões de mensagens, campo de texto e estados visuais de envio/leitura. Integrar aos contratos de serviço publicados por Pedro.
 - **Critério de Pronto (DoD):** Dois usuários de teste conseguem operar a interface mobile e visualizar mensagens e estados de leitura.
 
-#### [ISSUE-08] Criar seletor de anexos exclusivamente PDF (Responsável: Luana)
-- **Frente / Responsável:** Frente 2, Luana.
+#### [ISSUE-08] Criar seletor de anexos exclusivamente PDF (Responsáveis: Luana e Gilson)
+- **Frente / Responsáveis:** Frente 2, Luana e Gilson (Design UI/UX).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF11, RF12, RN06, RN07, RNF11, RNF12, SEG05.
 - **O que fazer:** Criar controle de seleção de arquivo aceitando PDF e exibindo nome, tamanho e feedback de erro. A validação de interface complementa, mas não substitui, a validação obrigatória do servidor.
 - **Critério de Pronto (DoD):** Interface oferece seleção de PDF e bloqueia visualmente formatos não permitidos antes do envio.
 
-### Frente 3: Pedro, Motor de Chat Realtime e Status de Leitura
+### Frente 3: Pedro, Luan e Diego, Desenvolvimento de Chat Realtime e Status de Leitura
 
-#### [ISSUE-09] Implementar listagem de conversas autorizadas (Responsável: Pedro)
-- **Frente / Responsável:** Frente 3, Pedro.
+#### [ISSUE-09] Implementar listagem de conversas autorizadas (Desenvolvimento: Pedro, Luan e Diego)
+- **Frente / Responsáveis:** Frente 3, Pedro, Luan e Diego (Desenvolvimento).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF08, RF09, RF14, RN05, RNF08, RNF09, RNF12, SEG04.
 - **O que fazer:** Criar consulta paginada de conversas do usuário autenticado e participantes autorizados. Restringir leitura no servidor/RLS para impedir acesso a conversas de terceiros.
 - **Critério de Pronto (DoD):** Usuários de teste recebem somente as conversas das quais participam, inclusive ao chamar a API diretamente.
 
-#### [ISSUE-10] Implementar envio e recebimento de texto em tempo real (Responsável: Pedro)
-- **Frente / Responsável:** Frente 3, Pedro.
+#### [ISSUE-10] Implementar envio e recebimento de texto em tempo real (Desenvolvimento: Pedro, Luan e Diego)
+- **Frente / Responsáveis:** Frente 3, Pedro, Luan e Diego (Desenvolvimento).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF08, RF09, RN08, RNF08, RNF09, RNF10, RNF12, SEG04.
 - **O que fazer:** Persistir mensagens de texto e publicar atualizações via Supabase Realtime. Validar remetente, destinatários e participação na conversa no servidor.
 - **Critério de Pronto (DoD):** Dois usuários autorizados trocam texto, recebem atualização sem recarregar e não conseguem publicar em conversa alheia.
 
-#### [ISSUE-11] Implementar status de leitura por destinatário (Responsável: Pedro)
-- **Frente / Responsável:** Frente 3, Pedro.
+#### [ISSUE-11] Implementar status de leitura por destinatário (Desenvolvimento: Pedro, Luan e Diego)
+- **Frente / Responsáveis:** Frente 3, Pedro, Luan e Diego (Desenvolvimento).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF10, RN08, RNF08, RNF12, SEG04.
 - **O que fazer:** Registrar visualização por mensagem e destinatário, atualizando o estado quando a mensagem for efetivamente exibida na conversa. Emitir atualização em tempo real aos participantes autorizados.
 - **Critério de Pronto (DoD):** A mensagem muda de não lida para lida somente para o destinatário que a visualizou.
 
-### Frente 4: Mariana, Upload Seguro de PDF e Painel Admin da TI
+### Frente 4: Pedro, Luan e Diego (Desenvolvimento), Mariana (SQA), Upload Seguro de PDF e Painel Admin da TI
 
-#### [ISSUE-12] Criar painel TI para gestão de contas (Responsável: Mariana)
-- **Frente / Responsável:** Frente 4, Mariana.
+#### [ISSUE-12] Criar painel TI para gestão de contas (Desenvolvimento: Pedro, Luan e Diego; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 4, Pedro, Luan e Diego (Desenvolvimento); Mariana (SQA).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF04, RF13, RF14, RN01, RN02, RN05, RN10, RNF07, SEG04, SEG07.
 - **O que fazer:** Criar telas e rotas para cadastrar, listar, consultar, bloquear e desativar contas. Impedir autorregistro e exigir perfil Admin TI validado no servidor.
 - **Critério de Pronto (DoD):** Admin TI executa as operações e funcionário não consegue executá-las nem por requisição direta.
 
-#### [ISSUE-13] Implementar grupos de liberação gradual e auditoria (Responsável: Mariana)
-- **Frente / Responsável:** Frente 4, Mariana.
+#### [ISSUE-13] Implementar grupos de liberação gradual e auditoria (Desenvolvimento: Pedro, Luan e Diego; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 4, Pedro, Luan e Diego (Desenvolvimento); Mariana (SQA).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF15, RF14, RN05, RN09, RN10, RNF07, RNF13, SEG04, SEG07.
 - **O que fazer:** Permitir à TI incluir/remover usuários dos grupos liberados para a Fase 1 e registrar ações administrativas com ator, ação, alvo e data/hora. Não liberar usuários fora do grupo autorizado.
 - **Critério de Pronto (DoD):** Usuário fora do grupo não acessa o sistema e cada alteração administrativa gera evento consultável de auditoria.
 
-#### [ISSUE-14] Enviar credenciais iniciais por e-mail de forma segura (Responsável: Mariana)
-- **Frente / Responsável:** Frente 4, Mariana.
+#### [ISSUE-14] Enviar credenciais iniciais por e-mail de forma segura (Desenvolvimento: Pedro, Luan e Diego; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 4, Pedro, Luan e Diego (Desenvolvimento); Mariana (SQA).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF05, RF04, RN01, RN03, RN10, RNF05, RNF06, SEG01, SEG02, SEG03, SEG06.
 - **O que fazer:** Integrar serviço de e-mail corporativo para disparar instruções/credencial inicial individual após cadastro pela TI. Não gravar segredo em logs nem expor credenciais em URL; aplicar validade/uso inicial conforme política definida.
 - **Critério de Pronto (DoD):** Cadastro autorizado dispara e-mail de primeiro acesso e a credencial inicial não aparece em logs ou URLs.
 
-#### [ISSUE-15] Implementar upload com validação real de PDF (Responsável: Mariana)
-- **Frente / Responsável:** Frente 4, Mariana.
+#### [ISSUE-15] Implementar upload com validação real de PDF (Desenvolvimento: Pedro, Luan e Diego; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 4, Pedro, Luan e Diego (Desenvolvimento); Mariana (SQA).
 - **Prioridade / Sprint:** Fase 2: Core Chat & Admin.
 - **Requisitos atendidos:** RF11, RF12, RN06, RN07, RNF11, RNF12, SEG05.
 - **O que fazer:** Criar endpoint e armazenamento privado com limite de tamanho configurável, validação de MIME e magic bytes e autorização de acesso. Rejeitar imagens, áudio, vídeo, Word, Excel e arquivos com extensão PDF cujo conteúdo real não seja PDF.
 - **Critério de Pronto (DoD):** PDF válido dentro do limite é armazenado e disponibilizado apenas aos participantes, enquanto arquivos renomeados/falsificados são rejeitados no servidor.
 
-### Frente 5: Ícaro, QA, Regras de Negócio e Documentação
+### Frente 5: Ícaro (PO) e Mariana (SQA), QA, Regras de Negócio e Documentação
 
-#### [ISSUE-16] Validar compatibilidade mobile e bloqueio desktop (Responsável: Ícaro)
-- **Frente / Responsável:** Frente 5, Ícaro.
+#### [ISSUE-16] Validar compatibilidade mobile e bloqueio desktop (PO: Ícaro; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 5, Ícaro (PO) e Mariana (SQA).
 - **Prioridade / Sprint:** Fase 3: Segurança & Homologação Diretoria.
 - **Requisitos atendidos:** RF01, RF02, RNF01, RNF02, RNF03, RNF04, RNF14.
 - **O que fazer:** Executar testes em Chrome Mobile Android e Safari iOS nas versões acordadas, além de tentativas de acesso via desktop/notebook e falsificação de User-Agent.
 - **Critério de Pronto (DoD):** Matriz registra navegadores/dispositivos testados, resultados e evidência de bloqueio desktop e acesso mobile.
 
-#### [ISSUE-17] Testar autenticação, sessão e administração (Responsável: Ícaro)
-- **Frente / Responsável:** Frente 5, Ícaro.
+#### [ISSUE-17] Testar autenticação, sessão e administração (PO: Ícaro; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 5, Ícaro (PO) e Mariana (SQA).
 - **Prioridade / Sprint:** Fase 3: Segurança & Homologação Diretoria.
 - **Requisitos atendidos:** RF03, RF04, RF05, RF06, RF07, RF13, RF14, RF15, RN01, RN02, RN03, RN04, RN05, RN09, RN10, RNF05, RNF06, RNF07, SEG01, SEG02, SEG03, SEG04, SEG06, SEG07.
 - **O que fazer:** Testar login, senha provisória, expiração de sessão, permissões Admin TI/Funcionário, bloqueio/desativação, e-mail inicial, grupos liberados e auditoria.
 - **Critério de Pronto (DoD):** Casos positivos e negativos passam, com evidências de que operações administrativas e dados de outros usuários não são acessíveis indevidamente.
 
-#### [ISSUE-18] Testar chat, privacidade e status de leitura (Responsável: Ícaro)
-- **Frente / Responsável:** Frente 5, Ícaro.
+#### [ISSUE-18] Testar chat, privacidade e status de leitura (PO: Ícaro; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 5, Ícaro (PO) e Mariana (SQA).
 - **Prioridade / Sprint:** Fase 3: Segurança & Homologação Diretoria.
 - **Requisitos atendidos:** RF08, RF09, RF10, RN08, RNF08, RNF09, RNF10, RNF12, SEG04.
 - **O que fazer:** Testar conversas entre usuários autorizados, persistência, atualização realtime, status lido/não lido e tentativas de consultar conversas de terceiros. Registrar falhas de desempenho ou disponibilidade observadas.
 - **Critério de Pronto (DoD):** Cenários de envio, recebimento, leitura e isolamento de dados são aprovados por dois ou mais usuários de teste.
 
-#### [ISSUE-19] Testar upload PDF e concluir README/rastreabilidade (Responsável: Ícaro)
-- **Frente / Responsável:** Frente 5, Ícaro.
+#### [ISSUE-19] Testar upload PDF e concluir README/rastreabilidade (PO: Ícaro; SQA: Mariana)
+- **Frente / Responsáveis:** Frente 5, Ícaro (PO) e Mariana (SQA).
 - **Prioridade / Sprint:** Fase 3: Segurança & Homologação Diretoria.
 - **Requisitos atendidos:** RF11, RF12, RN06, RN07, RNF11, RNF13, RNF12, SEG05.
 - **O que fazer:** Tentar enviar imagem, foto, áudio, vídeo, Word e Excel renomeados para PDF, além de PDF acima do limite. Finalizar README, instruções de execução e matriz de rastreabilidade completa.
