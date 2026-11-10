@@ -30,8 +30,46 @@ describe("decidirAcesso", () => {
     expect(decidirAcesso(padrao)).toBe("seguir");
   });
 
-  it("recusa token sem timestamp de login por senha", () => {
-    expect(decidirAcesso({ ...padrao, amr: [{ method: "token_refresh", timestamp: agora }] }))
-      .toBe("sessao-vencida");
+  it("aceita autenticação por outro método", () => {
+    expect(decidirAcesso({
+      ...padrao,
+      amr: [{ method: "otp", timestamp: agora - 3600 }],
+    })).toBe("seguir");
+  });
+
+  it("considera o menor timestamp entre métodos de login", () => {
+    expect(decidirAcesso({
+      ...padrao,
+      amr: [
+        { method: "otp", timestamp: agora - 13 * 3600 },
+        { method: "password", timestamp: agora - 60 },
+        { method: "token_refresh", timestamp: agora },
+      ],
+    })).toBe("sessao-vencida");
+  });
+
+  it("aceita relógio do Supabase dois minutos adiantado", () => {
+    expect(decidirAcesso({
+      ...padrao,
+      amr: [{ method: "password", timestamp: agora + 120 }],
+    })).toBe("seguir");
+  });
+
+  it("recusa relógio dez minutos adiantado", () => {
+    expect(decidirAcesso({
+      ...padrao,
+      amr: [{ method: "password", timestamp: agora + 600 }],
+    })).toBe("sessao-vencida");
+  });
+
+  it("recusa token que contém apenas token_refresh", () => {
+    expect(decidirAcesso({
+      ...padrao,
+      amr: [{ method: "token_refresh", timestamp: agora }],
+    })).toBe("sessao-vencida");
+  });
+
+  it("recusa token sem entrada de login válida", () => {
+    expect(decidirAcesso({ ...padrao, amr: [] })).toBe("sessao-vencida");
   });
 });

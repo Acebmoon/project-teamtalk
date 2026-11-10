@@ -1,10 +1,10 @@
 import { redirect } from "next/navigation";
-import { TelaInicial } from "@design/telas/inicio";
-import { sair } from "./sair";
-import { verificarSessao } from "./verificar-sessao";
+import { criarServidor } from "../supabase/servidor";
+import { avaliarSessao } from "./verificar-sessao";
 
-export async function mostrarInicio() {
-  const { decisao, supabase, usuario } = await verificarSessao();
+export async function carregarInicio() {
+  const supabase = await criarServidor();
+  const { decisao, usuario } = await avaliarSessao(supabase);
   if (decisao !== "seguir" || !usuario)
     redirect(decisao === "acesso-negado" ? "/login?erro=acesso" : "/login");
 
@@ -13,5 +13,5 @@ export async function mostrarInicio() {
     .eq("id", usuario.id)
     .single();
 
-  return TelaInicial({ nome: perfil?.display_name ?? usuario.email ?? "Usuário", sair });
+  return { nome: perfil?.display_name ?? usuario.email ?? "Usuário" };
 }
