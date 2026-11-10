@@ -10,13 +10,18 @@ A estimativa de escala é de aproximadamente **900 funcionários**. A Fase 1 ser
 
 ## Equipe e frentes de responsabilidade
 
-| Integrante | Frente | Responsabilidade |
+| Integrante | Papel | Frente / Responsabilidade |
 |---|---|---|
-| Elliot | Frente 1: Tech Lead, Arquitetura, Auth e Segurança | Setup, banco, autenticação, sessão, troca de senha no primeiro acesso, bloqueio desktop e RBAC no servidor |
-| Luana | Frente 2: UI/UX, Design System e Telas Mobile | Identidade visual, componentes mobile-first, login, primeiro acesso e interface de chat |
-| Pedro | Frente 3: Motor de Chat Realtime e Status de Leitura | Listagem de conversas, envio/recebimento de texto em tempo real e confirmação de leitura |
-| Mariana | Frente 4: Upload Seguro de PDF e Painel Admin da TI | Gestão de contas, liberação gradual, e-mail de credenciais iniciais, auditoria e upload validado de PDF |
-| Ícaro | Frente 5: Requisitos, QA, Regras de Negócio e Docs | Testes de aceitação, validação de segurança e regras, README e matriz de rastreabilidade |
+| Ícaro | Product Owner (PO) | Frente 5: requisitos, critérios de aceite, documentação e rastreabilidade |
+| Elliot | Tech Lead | Frente 1: arquitetura, ambiente, banco, autenticação, segurança e RBAC |
+| Luana | Designer UI/UX | Frente 2: identidade visual, design system e telas mobile-first |
+| Gilson | Designer UI/UX | Frente 2: criação e evolução conjunta de componentes, fluxos e telas mobile-first |
+| Mariana | Analista de SQA | Garantia da qualidade: planejamento e execução de testes, validação de segurança, administração e upload |
+| Pedro | Desenvolvedor | Equipe de desenvolvimento: chat, integrações e funcionalidades do MVP |
+| Luan | Desenvolvedor | Equipe de desenvolvimento: implementação e integração de funcionalidades do MVP |
+| Diego | Desenvolvedor | Equipe de desenvolvimento: implementação e integração de funcionalidades do MVP |
+
+**Organização do trabalho:** as Frentes 3 (chat) e 4 (administração, liberação e PDF) contam com a equipe de desenvolvimento formada por Pedro, Luan e Diego. Luana e Gilson compartilham a Frente 2 (UI/UX). Ícaro acompanha o produto como PO e Mariana responde por SQA. A divisão individual das tarefas dentro de cada frente deve ser alinhada pela equipe; os nomes listados não presumem usernames nem atribuições de conta no GitHub.
 
 ## Documentação do projeto
 
