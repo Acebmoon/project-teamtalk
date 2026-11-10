@@ -1,61 +1,65 @@
-# TeamTalk — base (tempval)
+# TeamTalk — execução local e autenticação (Issue 02)
 
-Fundação isolada do projeto em `base(tempval)/`: Next.js App Router, TypeScript, configuração Supabase local e modelo inicial do banco. Esta entrega prepara a base; não implementa ainda os fluxos de login, administração, chat, upload ou tempo real das Issues seguintes.
+## Estrutura obrigatória
+
+Na raiz do repositório existem três pastas com responsabilidades separadas:
+
+- `base(tempval)/`: workspace Next.js, configurações, migrations e arquivos finos de rota (`src/app/**`, `src/middleware.ts`). Não contém regras de negócio nem componentes de interface.
+- `controle-base-main/`: autenticação, sessão, integração Supabase e regras de acesso. `auth/` guarda ações e middleware; `supabase/` guarda clientes SSR por cookies.
+- `design-em-react/`: telas React e estilos. As telas recebem dados e ações por props, sem chamadas ao Supabase.
+
+`base(tempval)/tsconfig.json` expõe os aliases `@controle/*` e `@design/*`; `next.config.ts` habilita o acesso ao diretório externo e rastreia os arquivos a partir da raiz. O `package.json` da raiz usa npm workspaces.
 
 ## Requisitos
 
-- Node.js 20.9+
-- npm
-- Docker, para executar Supabase local
+Node.js 20.9+, npm e Docker (Supabase local).
 
-## Executar
-
-A partir da raiz do repositório:
+## Instalação e execução
 
 ```sh
-cd 'base(tempval)'
+# A partir da raiz do repositório
 npm install
+cd 'base(tempval)'
 cp .env.example .env.local
 npx supabase start
+npx supabase status
 ```
 
-Preencha `.env.local` com a `API URL` e a `anon key` informadas por `supabase start`, depois rode:
+Preencha `NEXT_PUBLIC_SUPABASE_URL` e `NEXT_PUBLIC_SUPABASE_ANON_KEY` com a URL e a anon key mostradas pelo Supabase local. `SESSAO_MAX_HORAS` é o limite de horas de cada sessão iniciada por senha (padrão 12).
 
 ```sh
 npm run db:reset
+npm run typecheck
+npm run lint
+npm run build
+npm test
 npm run dev
 ```
 
-Abra `http://localhost:3000`. Os comandos Supabase devem ser executados nesta pasta, onde está `supabase/config.toml`.
+Abra `http://localhost:3000/login`. O Supabase Studio fica em `http://localhost:54323`. Para testar com HTTPS, use um ambiente configurado com TLS; HSTS aplica-se a respostas HTTPS. Não use `service_role` no navegador nem commite `.env.local`.
 
-## Variáveis de ambiente
+## Roteiro de teste manual
 
-- `NEXT_PUBLIC_SUPABASE_URL`: URL do projeto Supabase.
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: chave pública/anon para o cliente do navegador; o acesso aos dados segue protegido por RLS.
+1. No Supabase Studio local, em **Authentication > Users**, crie uma conta de teste com e-mail e senha, marcando o e-mail como confirmado. A trigger da primeira migration cria automaticamente `public.users` com status `pending`.
+2. Execute no **SQL Editor** o script abaixo, substituindo o e-mail pelo da conta criada. Ele ativa a conta, habilita o grupo inicial e inclui o usuário nesse grupo.
 
-Não adicione segredos reais ao Git. Nunca exponha a chave `service_role` no navegador nem em variáveis `NEXT_PUBLIC_*`. O cadastro público está desativado; a criação de identidades deve ocorrer por um fluxo administrativo confiável.
+```sql
+update public.users set status = 'active' where email = 'pessoa@empresa.com';
+update public.release_groups set is_enabled = true where name = 'Diretoria / nível estratégico';
+insert into public.release_group_members (release_group_id, user_id)
+select g.id, u.id from public.release_groups g cross join public.users u
+where g.name = 'Diretoria / nível estratégico' and u.email = 'pessoa@empresa.com'
+on conflict do nothing;
+```
 
-## Cobertura da fundação (Issue 70)
+3. Em `/login`, entre com e-mail e senha. Deve abrir `/`, mostrar o nome de exibição e o botão **Sair**.
+4. Saia e tente entrar com uma senha incorreta: deve aparecer **Usuário ou senha inválidos.** abaixo do campo Senha.
+5. Entre novamente. No SQL Editor, execute `update public.users set status = 'blocked' where email = 'pessoa@empresa.com';`. Ao atualizar `/`, o middleware deve encerrar a sessão e mostrar **Acesso não liberado. Fale com a TI.** em `/login`.
+6. Libere novamente a conta com `status = 'active'`, entre, clique **Sair** e confirme o redirecionamento para `/login`. Outra sessão de um segundo navegador não deve ser encerrada pelo logout do primeiro.
+7. Para testar expiração rapidamente, defina `SESSAO_MAX_HORAS=0.001` em `.env.local` e reinicie o Next; após alguns segundos do login, uma rota protegida deve redirecionar para `/login?erro=sessao`.
 
-As migrations criam perfis ligados a `auth.users`, grupos e membros de liberação, conversas e participantes, mensagens (texto ou referência a PDF), leituras e auditoria. Incluem chaves estrangeiras, restrições, índices, timestamps, criação automática do perfil e RLS.
+Somente `/login` é pública. A sessão é validada no servidor por `auth.getUser()` e a autorização por `is_active_authorized_user()` a cada acesso protegido. A duração é calculada pelo `amr.password.timestamp` do token daquela sessão; `last_sign_in_at` não é usado. As credenciais persistem em cookies do `@supabase/ssr`, com `Secure` em produção e `SameSite=Lax`, sem gravação de token em `localStorage`. O logout é limitado ao aparelho atual (`scope: local`).
 
-A migration `20261110001000_authorized_chat_access.sql` aplica o gate de liberação: operações de leitura de conversas, participantes, mensagens e leituras exigem conta ativa, participação na conversa e, para funcionários, pertencimento a pelo menos um grupo habilitado. O grupo inicial previsto para a Diretoria é criado desabilitado, aguardando autorização explícita. Admins não ganham acesso implícito ao conteúdo privado das conversas.
+## Escopo desta etapa
 
-As escritas via cliente permanecem bloqueadas até que cada fluxo tenha políticas estreitas e validação server-side. O banco contém o modelo de auditoria, mas os endpoints e a gravação efetiva de eventos administrativos ainda não estão implementados.
-
-## O que falta antes de uso real
-
-Esta base, sozinha, não deve ser implantada para usuários. Ainda faltam autenticação e gestão segura de sessão no Next.js, autorização e rotas server-side, cadastro/administração de contas, políticas de escrita, interface de login/troca de senha, chat e Realtime, upload privado de PDF com validação real (incluindo magic bytes e limite acordado), testes automatizados e observabilidade. User-Agent não é uma proteção suficiente para bloquear desktops.
-
-## Próximo passo recomendado
-
-Implementar a **Issue 02 — autenticação individual e sessão segura**: cliente Supabase para servidor integrado ao mecanismo de cookies do Next.js, login/logout, proteção de rotas e verificação server-side de status/grupo autorizado. Não habilitar o chat antes de aplicar o bloqueio de troca obrigatória de senha da Issue 03 e as permissões server-side da Issue 04.
-
-## Scripts
-
-- `npm run dev` — servidor local Next.js.
-- `npm run build` — build de produção.
-- `npm run lint` — ESLint.
-- `npm run typecheck` — verificação TypeScript.
-- `npm run supabase:start` / `npm run supabase:stop` — Supabase local.
-- `npm run db:reset` — recria o banco local e aplica migrations.
+A Issue 02 traz apenas o login e a página protegida mínima. Troca obrigatória de senha provisória (Issue 03), bloqueio desktop e RBAC completo (Issue 04), chat, administração e upload ficam para as entregas próprias. As migrations originais não foram alteradas.

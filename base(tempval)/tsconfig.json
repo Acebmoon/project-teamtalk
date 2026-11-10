@@ -14,8 +14,20 @@
     "jsx": "preserve",
     "incremental": true,
     "plugins": [{ "name": "next" }],
-    "paths": { "@/*": ["./src/*"] }
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@controle/*": ["../controle-base-main/*"],
+      "@design/*": ["../design-em-react/*"]
+    }
   },
-  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"],
+  "include": [
+    "next-env.d.ts",
+    ".next/types/**/*.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "../controle-base-main/**/*.ts",
+    "../design-em-react/**/*.tsx"
+  ],
   "exclude": ["node_modules"]
 }
