@@ -12,7 +12,7 @@ export const viewport: Viewport = {
   themeColor: "#176b5b",
 };
 
-export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default function EstruturaRaiz({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="pt-BR">
       <body>{children}</body>
