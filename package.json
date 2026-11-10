@@ -1,0 +1,5 @@
+{
+  "name": "teamtalk",
+  "private": true,
+  "workspaces": ["base(tempval)"]
+}

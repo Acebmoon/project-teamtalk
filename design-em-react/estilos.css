@@ -1,0 +1,31 @@
+* { box-sizing: border-box; }
+:root {
+  color-scheme: light;
+  --cor-texto: #173a35;
+  --cor-secundaria: #566c65;
+  --cor-primaria: #176b5b;
+  --cor-primaria-hover: #105447;
+  --cor-superficie: #ffffff;
+  --cor-fundo: #f0f5f3;
+  --cor-borda: #a5b8b1;
+  --cor-foco: #245bff;
+  --cor-erro: #a42126;
+}
+html, body { min-height: 100%; margin: 0; }
+body {
+  background: var(--cor-fundo);
+  color: var(--cor-texto);
+  font-family: Arial, Helvetica, sans-serif;
+}
+.pagina { min-height: 100svh; display: grid; place-items: center; padding: 20px; }
+.painel { width: min(100%, 420px); padding: 24px; background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: 12px; }
+h1 { font-size: 28px; margin: 0 0 14px; }
+p { line-height: 1.5; color: var(--cor-secundaria); }
+.formulario { display: grid; gap: 10px; }
+label { font-weight: 700; }
+input, button { width: 100%; min-height: 48px; font: inherit; border-radius: 8px; }
+input { min-width: 0; padding: 10px 12px; border: 1px solid var(--cor-borda); background: var(--cor-superficie); color: var(--cor-texto); font-size: 16px; }
+button { margin-top: 12px; padding: 12px; border: none; background: var(--cor-primaria); color: white; font-weight: 700; cursor: pointer; }
+button:hover { background: var(--cor-primaria-hover); }
+:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
+.erro { margin: 0; color: var(--cor-erro); font-size: 14px; }

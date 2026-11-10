@@ -19,33 +19,38 @@ Documento de execução do MVP do Aplicativo Web de Comunicação Interna. Prazo
 
 ## 2. Estrutura enxuta de pastas
 
-    a3-comunicacao-interna/
-    ├── src/
-    │   ├── app/
-    │   │   ├── login/
-    │   │   ├── primeiro-acesso/
-    │   │   ├── chat/
-    │   │   ├── admin/
-    │   │   └── api/
-    │   ├── components/
-    │   │   ├── ui/
-    │   │   ├── chat/
-    │   │   └── admin/
-    │   ├── lib/
-    │   │   ├── auth/
-    │   │   ├── supabase/
-    │   │   └── security/
-    │   └── services/
-    ├── supabase/
-    │   └── migrations/
-    ├── tests/
-    │   ├── unit/
-    │   └── e2e/
-    ├── docs/
-    │   └── requirements-matrix.md
-    ├── middleware.ts
-    ├── README.md
-    └── package.json
+A estrutura do aplicativo é obrigatoriamente dividida em **três pastas na raiz**. A estrutura antiga concentrada em `src/` não vale mais para as novas Issues.
+
+```text
+project-teamtalk/
+├── package.json                    # npm workspaces: ["base(tempval)"]
+├── base(tempval)/                  # só o mínimo exigido pelo Next.js e Supabase local
+│   ├── package.json
+│   ├── next.config.ts               # externalDir e outputFileTracingRoot na raiz
+│   ├── tsconfig.json                # aliases @controle/* e @design/*
+│   ├── .env.example
+│   ├── eslint.config.mjs
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── layout.tsx           # importa o CSS do design
+│   │   │   ├── page.tsx             # apenas encaminha para auth/inicio
+│   │   │   └── login/page.tsx       # apenas encaminha para auth/login
+│   │   └── middleware.ts            # apenas encaminha para auth/middleware
+│   └── supabase/
+│       ├── config.toml
+│       └── migrations/              # migrations existentes, sem alterações
+├── controle-base-main/             # infraestrutura e regras do servidor
+│   ├── auth/                        # login, logout, validação, decisão pura e testes
+│   └── supabase/                    # clientes SSR/cookies e navegador
+├── design-em-react/                # telas React e apresentação sem acesso ao Supabase
+│   ├── telas/
+│   └── estilos.css
+└── docs/                           # requisitos e documentação do projeto
+```
+
+O `npm install` deve ser executado na **raiz**. A partir de `base(tempval)/`, executar `npm run dev`, `npm run typecheck`, `npm run lint`, `npm run build` e `npm test`. Em `base(tempval)/next.config.ts`, habilitar `experimental.externalDir = true` e apontar `outputFileTracingRoot` para a raiz. Em `base(tempval)/tsconfig.json`, manter `@controle/*` apontando para `../controle-base-main/*`, `@design/*` para `../design-em-react/*`, incluindo os arquivos TypeScript de controle e TSX de design.
+
+Os arquivos obrigatórios do App Router e `src/middleware.ts` em `base(tempval)/` são finos: apenas importam/repassam o fluxo. As regras de sessão, autorização, acesso ao banco e APIs pertencem a `controle-base-main/`. As telas recebem dados e ações via props e permanecem integralmente em `design-em-react/`.
 
 ## 3. Frentes de trabalho
 
