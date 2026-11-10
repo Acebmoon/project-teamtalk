@@ -5,13 +5,14 @@ import { decidirAcesso } from "./decidir-acesso";
 import { criarServidor } from "../supabase/servidor";
 
 export async function entrar(formulario: FormData): Promise<void> {
-  const email = formulario.get("usuario");
-  const senha = formulario.get("senha");
-  if (typeof email !== "string" || !email.trim() || typeof senha !== "string" || !senha)
-    redirect("/login?erro=credenciais");
+  const campoEmail = formulario.get("usuario");
+  const campoSenha = formulario.get("senha");
+  const email = typeof campoEmail === "string" ? campoEmail.trim() : "";
+  const senha = typeof campoSenha === "string" ? campoSenha : "";
+  if (!email || !senha) redirect("/login?erro=credenciais");
 
   const supabase = await criarServidor();
-  const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password: senha });
+  const { error } = await supabase.auth.signInWithPassword({ email, password: senha });
   if (error) redirect("/login?erro=credenciais");
 
   const { data: usuario } = await supabase.auth.getUser();
