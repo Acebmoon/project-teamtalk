@@ -1,11 +1,12 @@
-type Props = { entrar: (dados: FormData) => Promise<void>; mensagem: string };
+type Props = { entrar: (dados: FormData) => Promise<void>; mensagem: string; aviso: string };
 
-export function TelaLogin({ entrar, mensagem }: Props) {
+export function TelaLogin({ entrar, mensagem, aviso }: Props) {
   return (
     <main className="pagina">
       <section className="painel" aria-labelledby="titulo-login">
         <h1 id="titulo-login">TeamTalk</h1>
         <p>Entre com sua conta autorizada.</p>
+        {aviso && <p role="status">{aviso}</p>}
         <form action={entrar} className="formulario">
           <label htmlFor="usuario">Usuário</label>
           <input id="usuario" name="usuario" type="email" autoComplete="username" required />

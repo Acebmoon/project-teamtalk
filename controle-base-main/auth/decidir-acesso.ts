@@ -1,14 +1,17 @@
-export type DecisaoAcesso = "seguir" | "login" | "acesso-negado" | "sessao-vencida";
+export type DecisaoAcesso =
+  "seguir" | "login" | "acesso-negado" | "sessao-vencida" | "trocar-senha";
 
 export function decidirAcesso({
   usuarioValido,
   autorizado,
+  precisaTrocarSenha,
   amr,
   agora,
   limiteHoras,
 }: {
   usuarioValido: boolean;
   autorizado: boolean;
+  precisaTrocarSenha: boolean;
   amr: unknown;
   agora: number;
   limiteHoras: number;
@@ -30,8 +33,9 @@ export function decidirAcesso({
     : [];
   const inicio = horarios.length ? Math.min(...horarios) : null;
 
-  return inicio === null || !Number.isFinite(limiteHoras) || limiteHoras <= 0 ||
-    inicio > agora + 300 || agora - inicio >= limiteHoras * 3600
-    ? "sessao-vencida"
-    : "seguir";
+  if (inicio === null || !Number.isFinite(limiteHoras) || limiteHoras <= 0 ||
+    inicio > agora + 300 || agora - inicio >= limiteHoras * 3600)
+    return "sessao-vencida";
+
+  return precisaTrocarSenha ? "trocar-senha" : "seguir";
 }
