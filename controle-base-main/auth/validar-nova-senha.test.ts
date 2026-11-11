@@ -18,4 +18,4 @@ describe("validarNovaSenha", () => {
   it("aceita senha com dez caracteres e confirmação igual", () => {
     expect(validarNovaSenha("1234567890", "1234567890")).toBeNull();
   });
-}
+});
