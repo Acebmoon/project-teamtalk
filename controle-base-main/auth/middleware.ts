@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { dispositivoPermitido } from "../dispositivo/verificar-dispositivo";
+import { decidirRotaDispositivo, dispositivoPermitido } from "../dispositivo/verificar-dispositivo";
 import { criarServidorMiddleware } from "../supabase/middleware";
 import { decidirRota } from "./decidir-rota";
 import { avaliarSessao } from "./verificar-sessao";
@@ -7,20 +7,20 @@ import { avaliarSessao } from "./verificar-sessao";
 export async function middleware(requisicao: NextRequest) {
   const rota = requisicao.nextUrl.pathname;
   const metodo = requisicao.method.toUpperCase();
-  const leitura = metodo === "GET" || metodo === "HEAD";
-  const bloqueio = rota === "/dispositivo-bloqueado";
   const permitido = dispositivoPermitido(
     requisicao.headers.get("user-agent"), requisicao.headers.get("sec-ch-ua-platform"),
   );
+  const dispositivo = decidirRotaDispositivo(rota, metodo, permitido);
 
-  // Antes do Supabase, inclusive em server actions e chamadas diretas de API.
-  if (!permitido) {
-    if (bloqueio && leitura) return NextResponse.next({ request: requisicao });
-    if (!leitura) return new NextResponse(null, { status: 403 });
+  // Antes de qualquer chamada ao Supabase, inclusive em APIs e server actions.
+  if (dispositivo === "erro-api")
+    return NextResponse.json({ erro: "Dispositivo não permitido." }, { status: 403 });
+  if (dispositivo === "erro-vazio") return new NextResponse(null, { status: 403 });
+  if (dispositivo === "redirecionar-bloqueio")
     return NextResponse.redirect(new URL("/dispositivo-bloqueado", requisicao.url));
-  }
-  if (bloqueio)
-    return NextResponse.redirect(new URL("/", requisicao.url), leitura ? 307 : 303);
+  if (dispositivo === "redirecionar-inicio")
+    return NextResponse.redirect(new URL("/", requisicao.url), metodo === "GET" || metodo === "HEAD" ? 307 : 303);
+  if (!permitido) return NextResponse.next({ request: requisicao });
 
   const { supabase, contexto } = criarServidorMiddleware(requisicao);
   const { decisao, ehAdmin } = await avaliarSessao(supabase);

@@ -77,10 +77,12 @@ As Issues 02 a 04 entregam login, sessão, troca de senha provisória, bloqueio 
 curl -i -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/130.0.0.0 Safari/537.36' http://localhost:3000/
 curl -i -A 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_6 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1' http://localhost:3000/
 curl -i -X POST -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' http://localhost:3000/api/admin/estado
+curl -i -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' http://localhost:3000/api/admin/estado
+curl -i -X POST -A 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' http://localhost:3000/login
 curl -i -A 'iPhone' -H 'Sec-CH-UA-Platform: "Windows"' http://localhost:3000/
 ```
 
-   O primeiro deve redirecionar para `/dispositivo-bloqueado` (acessível sem sessão); o segundo chega ao controle de sessão e, sem login, redireciona para `/login`; o POST de Windows recebe 403 **sem corpo**; o último prova que Client Hints tem prioridade sobre o User-Agent. Para GET/HEAD de API em computador, a restrição de dispositivo vem primeiro e redireciona à tela de bloqueio.
+   O primeiro deve redirecionar para `/dispositivo-bloqueado` (acessível sem sessão); o segundo chega ao controle de sessão e, sem login, redireciona para `/login`; o POST de Windows em `/api/admin/estado` recebe **403 JSON `{ "erro": "Dispositivo não permitido." }`**; o último prova que Client Hints tem prioridade sobre o User-Agent. Em qualquer rota `/api` ou `/api/**`, todos os métodos de aparelho bloqueado recebem 403 JSON, sem redirecionamento. Fora de `/api`, POST de aparelho bloqueado continua retornando 403 sem corpo.
 3. Crie duas contas de teste no Supabase, siga o roteiro de primeiro acesso acima para ambas e habilite o grupo. Uma permanece `role = 'employee'`; marque a conta da TI com `role = 'it_admin'` no SQL Editor, já com `status = 'active'` e `must_change_password = false` (após a troca real):
 
 ```sql

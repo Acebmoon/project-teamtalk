@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { dispositivoPermitido } from "./verificar-dispositivo";
+import { decidirRotaDispositivo, dispositivoPermitido } from "./verificar-dispositivo";
 
 const casos: [string, string, string | null, boolean][] = [
   ["Chrome Android", "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36", '"Android"', true],
@@ -29,5 +29,30 @@ describe("dispositivoPermitido", () => {
     expect(dispositivoPermitido("iPhone", '""')).toBe(false);
     expect(dispositivoPermitido("Windows", '"Android"')).toBe(true);
     expect(dispositivoPermitido(null, null)).toBe(false);
+  });
+});
+
+describe("decidirRotaDispositivo", () => {
+  it.each(["GET", "HEAD", "POST", "PUT", "DELETE"])(
+    "recusa %s em /api e subrotas com 403 JSON, sem redirecionar",
+    (metodo) => {
+      expect(decidirRotaDispositivo("/api", metodo, false)).toBe("erro-api");
+      expect(decidirRotaDispositivo("/api/admin/estado", metodo, false)).toBe("erro-api");
+    },
+  );
+
+  it("mantém a tela pública e o bloqueio de métodos fora da API", () => {
+    expect(decidirRotaDispositivo("/dispositivo-bloqueado", "GET", false)).toBe("seguir");
+    expect(decidirRotaDispositivo("/dispositivo-bloqueado", "HEAD", false)).toBe("seguir");
+    expect(decidirRotaDispositivo("/", "GET", false)).toBe("redirecionar-bloqueio");
+    expect(decidirRotaDispositivo("/login", "HEAD", false)).toBe("redirecionar-bloqueio");
+    expect(decidirRotaDispositivo("/", "POST", false)).toBe("erro-vazio");
+    expect(decidirRotaDispositivo("/dispositivo-bloqueado", "POST", false)).toBe("erro-vazio");
+  });
+
+  it("mantém acesso móvel e redireciona a página de bloqueio ao início", () => {
+    expect(decidirRotaDispositivo("/api/admin/estado", "GET", true)).toBe("seguir");
+    expect(decidirRotaDispositivo("/", "POST", true)).toBe("seguir");
+    expect(decidirRotaDispositivo("/dispositivo-bloqueado", "GET", true)).toBe("redirecionar-inicio");
   });
 });
