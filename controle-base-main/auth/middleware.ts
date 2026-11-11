@@ -18,6 +18,7 @@ export async function middleware(requisicao: NextRequest) {
 
   if (decisao === "acesso-negado" || decisao === "sessao-vencida") {
     await supabase.auth.signOut({ scope: "local" });
+    if (rota === "/login") return contexto.resposta;
     return redirecionar(decisao === "acesso-negado"
       ? "/login?erro=acesso" : "/login?erro=sessao");
   }

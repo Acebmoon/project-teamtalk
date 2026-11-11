@@ -39,9 +39,6 @@ as $$
   );
 $$;
 
-revoke all on function public.get_access_state() from public;
-grant execute on function public.get_access_state() to authenticated;
-
 -- As policies existentes usam esta função (mensagens e leituras indiretamente).
 create or replace function public.can_access_conversation(p_conversation_id uuid)
 returns boolean
@@ -62,3 +59,32 @@ as $$
         and participant.user_id = (select auth.uid())
     );
 $$;
+-- Admin TI só ganha privilégios depois de substituir a senha provisória.
+create or replace function public.is_active_it_admin()
+returns boolean
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select exists (
+    select 1 from public.users
+    where id = (select auth.uid())
+      and role = 'it_admin'::public.user_role
+      and status = 'active'::public.user_status
+      and must_change_password = false
+  );
+$$;
+
+-- Explicitamente restrito a authenticated, inclusive diante dos grants padrão.
+revoke all on function public.get_access_state() from public, anon;
+revoke all on function public.is_active_authorized_user() from public, anon;
+revoke all on function public.is_active_it_admin() from public, anon;
+revoke all on function public.can_access_conversation(uuid) from public, anon;
+revoke all on function public.can_access_message(uuid) from public, anon;
+
+grant execute on function public.get_access_state() to authenticated;
+grant execute on function public.is_active_authorized_user() to authenticated;
+grant execute on function public.is_active_it_admin() to authenticated;
+grant execute on function public.can_access_conversation(uuid) to authenticated;
+grant execute on function public.can_access_message(uuid) to authenticated;

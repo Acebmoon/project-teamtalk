@@ -17,13 +17,13 @@ export function TelaPrimeiroAcesso({ email, trocarSenha, sair, mensagem }: Props
             readOnly autoComplete="username" />
           <label htmlFor="nova-senha">Nova senha</label>
           <input id="nova-senha" name="senha" type="password"
-            autoComplete="new-password" minLength={10} required
+            autoComplete="new-password" minLength={10} maxLength={72} required
             aria-describedby={mensagem ? "regra-senha erro-troca" : "regra-senha"}
             aria-invalid={!!mensagem} />
-          <p id="regra-senha">Use pelo menos 10 caracteres.</p>
+          <p id="regra-senha">Use pelo menos 10 caracteres, até 72 bytes.</p>
           <label htmlFor="confirmacao">Confirmar nova senha</label>
           <input id="confirmacao" name="confirmacao" type="password"
-            autoComplete="new-password" minLength={10} required
+            autoComplete="new-password" minLength={10} maxLength={72} required
             aria-describedby={mensagem ? "erro-troca" : undefined}
             aria-invalid={!!mensagem} />
           {mensagem && <p className="erro" id="erro-troca" role="alert">{mensagem}</p>}

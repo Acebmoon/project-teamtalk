@@ -30,9 +30,6 @@ export async function trocarSenha(formulario: FormData): Promise<void> {
   }
 
   const { error: erroSaida } = await supabase.auth.signOut({ scope: "global" });
-  if (erroSaida) {
-    await supabase.auth.signOut({ scope: "local" });
-    redirect("/login?erro=sessao");
-  }
+  if (erroSaida) await supabase.auth.signOut({ scope: "local" });
   redirect("/login?aviso=senha-alterada");
 }

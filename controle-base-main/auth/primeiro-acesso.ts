@@ -15,6 +15,7 @@ export async function carregarPrimeiroAcesso() {
 export function mensagemDeErroTroca(erro?: string) {
   switch (erro) {
     case "curta": return "A nova senha deve ter pelo menos 10 caracteres.";
+    case "longa": return "A nova senha é muito longa (máximo de 72 bytes).";
     case "confirmacao": return "As senhas digitadas não são iguais.";
     case "igual": return "A nova senha deve ser diferente da senha provisória.";
     case "falha": return "Não foi possível alterar a senha. Tente novamente.";
