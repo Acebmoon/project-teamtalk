@@ -1,4 +1,4 @@
-# TeamTalk — execução local e autenticação (Issue 02)
+# TeamTalk — execução local e autenticação (Issues 02 e 03)
 
 ## Estrutura obrigatória
 
@@ -52,14 +52,18 @@ where g.name = 'Diretoria / nível estratégico' and u.email = 'pessoa@empresa.c
 on conflict do nothing;
 ```
 
-3. Em `/login`, entre com e-mail e senha. Deve abrir `/`, mostrar o nome de exibição e o botão **Sair**.
-4. Saia e tente entrar com uma senha incorreta: deve aparecer **Usuário ou senha inválidos.** abaixo do campo Senha.
-5. Entre novamente. No SQL Editor, execute `update public.users set status = 'blocked' where email = 'pessoa@empresa.com';`. Ao atualizar `/`, o middleware deve encerrar a sessão e mostrar **Acesso não liberado. Fale com a TI.** em `/login`.
-6. Libere novamente a conta com `status = 'active'`, entre, clique **Sair** e confirme o redirecionamento para `/login`. Outra sessão de um segundo navegador não deve ser encerrada pelo logout do primeiro.
-7. Para testar expiração rapidamente, defina `SESSAO_MAX_HORAS=0.001` em `.env.local` e reinicie o Next; após alguns segundos do login, uma rota protegida deve redirecionar para `/login?erro=sessao`.
+3. Em `/login`, entre com a senha provisória (com pelo menos 10 caracteres). Deve abrir somente `/primeiro-acesso`; tentar `/` deve redirecionar de volta, sem encerrar a sessão.
+4. Digite uma senha com menos de 10 caracteres e uma confirmação diferente (separadamente): o navegador ou servidor deve rejeitar e mostrar a regra/erro em texto. Tente a própria senha provisória e confirme a mensagem específica.
+5. Salve uma senha nova válida, diferente da provisória. Deve ir para `/login?aviso=senha-alterada`, mostrar **Senha alterada. Entre com a nova senha.** e encerrar a sessão globalmente.
+6. Entre com a senha nova. Deve abrir `/`, mostrar o nome de exibição e o botão **Sair**. A senha provisória não deve mais autenticar.
+7. Saia e tente entrar com senha incorreta: deve aparecer **Usuário ou senha inválidos.** abaixo do campo Senha.
+8. No SQL Editor, confira `select email, must_change_password from public.users where email = 'pessoa@empresa.com';`: depois da troca, a marca deve ser `false`. Para forçar novo primeiro acesso em teste, execute `update public.users set must_change_password = true where email = 'pessoa@empresa.com';`. `/primeiro-acesso` deve voltar a ser a única rota acessível e a leitura de conversas ficar bloqueada pelo RLS; redefina a senha via Supabase Auth para testar o trigger e depois marque `true` caso simule uma redefinição pela TI.
+9. Execute `update public.users set status = 'blocked' where email = 'pessoa@empresa.com';`. Ao atualizar uma rota, o middleware deve encerrar a sessão e mostrar **Acesso não liberado. Fale com a TI.** em `/login`.
+10. Libere a conta novamente com `status = 'active'`, entre, clique **Sair** e confirme o redirecionamento para `/login`. Outra sessão de um segundo navegador não deve ser encerrada pelo logout local.
+11. Para testar expiração rapidamente, defina `SESSAO_MAX_HORAS=0.001` em `.env.local` e reinicie o Next; após alguns segundos, uma rota protegida deve redirecionar para `/login?erro=sessao`, inclusive durante o primeiro acesso.
 
-Somente `/login` é pública. A sessão é validada no servidor por `auth.getUser()` e a autorização por `is_active_authorized_user()` a cada acesso protegido. A duração é calculada pelo `amr.password.timestamp` do token daquela sessão; `last_sign_in_at` não é usado. As credenciais persistem em cookies do `@supabase/ssr`, com `Secure` em produção e `SameSite=Lax`, sem gravação de token em `localStorage`. O logout é limitado ao aparelho atual (`scope: local`).
+`/login` é a única rota pública. `/primeiro-acesso` exige conta autorizada, marca de troca e sessão válida. A sessão é validada no servidor por `auth.getUser()` e o acesso por `get_access_state()` em uma RPC, sem perder a regra de grupos habilitados. A duração é calculada pelo `amr` do token daquela sessão; `last_sign_in_at` não é usado. As credenciais persistem em cookies do `@supabase/ssr`, com `Secure` em produção e `SameSite=Lax`, sem gravar token em `localStorage`. Sair manualmente usa `scope: local`; concluir a troca usa `scope: global` e exige novo login.
 
 ## Escopo desta etapa
 
-A Issue 02 traz apenas o login e a página protegida mínima. Troca obrigatória de senha provisória (Issue 03), bloqueio desktop e RBAC completo (Issue 04), chat, administração e upload ficam para as entregas próprias. As migrations originais não foram alteradas.
+As Issues 02 e 03 entregam login, sessão e troca obrigatória da senha provisória. Bloqueio desktop e RBAC completo (Issue 04), chat, administração, e-mail inicial e upload ficam para as entregas próprias. As duas migrations originais permanecem intactas.

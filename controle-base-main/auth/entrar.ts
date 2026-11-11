@@ -16,10 +16,9 @@ export async function entrar(formulario: FormData): Promise<void> {
   if (error) redirect("/login?erro=credenciais");
 
   const { decisao } = await avaliarSessao(supabase);
-  if (decisao !== "seguir") {
-    await supabase.auth.signOut({ scope: "local" });
-    redirect(decisao === "acesso-negado" ? "/login?erro=acesso" : "/login?erro=sessao");
-  }
+  if (decisao === "seguir") redirect("/");
+  if (decisao === "trocar-senha") redirect("/primeiro-acesso");
 
-  redirect("/");
+  await supabase.auth.signOut({ scope: "local" });
+  redirect(decisao === "acesso-negado" ? "/login?erro=acesso" : "/login?erro=sessao");
 }
