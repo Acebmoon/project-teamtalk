@@ -6,7 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint .",
+    "lint": "cd .. && eslint --config \"base(tempval)/eslint.config.mjs\" \"base(tempval)\" controle-base-main design-em-react",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --root ..",
     "supabase:start": "supabase start",
