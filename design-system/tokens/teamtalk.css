@@ -1,0 +1,57 @@
+/* TeamTalk UI Design Tokens — v1.2
+   Fonte: seis pranchas aprovadas e especificações funcionais disponíveis.
+   Não inserir fontes proprietárias sem autorização/licença válida. */
+:root {
+  /* Cores compartilhadas */
+  --tt-color-amazon-orange: #FF9900;
+  --tt-color-amazon-dark: #131A22;
+  --tt-color-text-primary: #111827;
+  --tt-color-text-secondary: #687280;
+  --tt-color-background: #F8FAFC;
+  --tt-color-separator: #E5E7EB;
+  --tt-color-verification: #1D9BF0;
+  --tt-color-message-sent: #013A5B;
+  --tt-color-message-received: #FFFFFF;
+  --tt-color-error: #D13212;
+  --tt-color-success: #38B000;
+  --tt-color-warning: #FFB000;
+
+  /* Avatares por departamento */
+  --tt-dept-ti: #FF9900;
+  --tt-dept-ti-text: #232F3E;
+  --tt-dept-operations: #345B83;
+  --tt-dept-hr: #7B5266;
+  --tt-dept-marketing: #B34E32;
+  --tt-dept-projects: #24776D;
+  --tt-avatar-text-light: #FFFFFF;
+
+  /* Tipografia */
+  --tt-font-family: "Amazon Ember", Inter, Arial, sans-serif;
+
+  /* Viewport e dimensões */
+  --tt-viewport-reference-width: 390px;
+  --tt-viewport-reference-height: 844px;
+  --tt-header-height: 64px;
+  --tt-tabs-height: 48px;
+  --tt-list-item-height: 72px;
+  --tt-bottom-nav-height: 64px;
+  --tt-avatar-size: 48px;
+  --tt-icon-size: 24px;
+  --tt-touch-target-min: 44px;
+  --tt-date-separator-height: 32px;
+
+  /* Mensagens */
+  --tt-message-bubble-radius: 16px;
+  --tt-message-bubble-padding: 12px;
+  --tt-date-separator-radius: 16px;
+  --tt-message-edit-window: 15min;
+  --tt-pdf-max-size: 10MB;
+
+  /* Espaçamento-base */
+  --tt-space-1: 4px;
+  --tt-space-2: 8px;
+  --tt-space-3: 12px;
+  --tt-space-4: 16px;
+  --tt-space-6: 24px;
+  --tt-space-8: 32px;
+}

@@ -1,0 +1,169 @@
+{
+  "name": "TeamTalk UI Design Tokens",
+  "version": "1.2",
+  "status": "Consolidado a partir das seis pranchas aprovadas e das especificações disponíveis. Decisões pendentes estão explicitamente identificadas.",
+  "typography": {
+    "preferred": "Amazon Ember",
+    "fallback": [
+      "Inter",
+      "Arial",
+      "sans-serif"
+    ],
+    "licenseNote": "Os arquivos de fonte não estão incluídos. Usar Amazon Ember somente com arquivos e autorização de uso válidos."
+  },
+  "shared": {
+    "colors": {
+      "amazonOrange": "#FF9900",
+      "amazonDark": "#131A22",
+      "textPrimary": "#111827",
+      "textSecondary": "#687280",
+      "background": "#F8FAFC",
+      "separator": "#E5E7EB",
+      "verificationBlue": "#1D9BF0",
+      "sentBubble": "#013A5B",
+      "receivedBubble": "#FFFFFF",
+      "error": "#D13212",
+      "success": "#38B000",
+      "warning": "#FFB000"
+    },
+    "referenceViewportCssPx": {
+      "width": 390,
+      "height": 844
+    },
+    "iconSizePx": 24,
+    "minimumTouchTargetPx": 44,
+    "spacingPx": [
+      4,
+      8,
+      12,
+      16,
+      24,
+      32
+    ],
+    "radiiPx": {
+      "messageBubble": 16,
+      "dateSeparator": 16
+    }
+  },
+  "departmentAvatars": {
+    "technology": {
+      "label": "Tecnologia (TI)",
+      "initials": "TI",
+      "background": "#FF9900",
+      "foreground": "#232F3E"
+    },
+    "operations": {
+      "label": "Operações",
+      "initials": "OP",
+      "background": "#345B83",
+      "foreground": "#FFFFFF"
+    },
+    "humanResources": {
+      "label": "Recursos Humanos",
+      "initials": "RH",
+      "background": "#7B5266",
+      "foreground": "#FFFFFF"
+    },
+    "marketing": {
+      "label": "Marketing",
+      "initials": "MK",
+      "background": "#B34E32",
+      "foreground": "#FFFFFF"
+    },
+    "projects": {
+      "label": "Projetos",
+      "initials": "PJ",
+      "background": "#24776D",
+      "foreground": "#FFFFFF"
+    }
+  },
+  "screens": {
+    "listaDeConversas": {
+      "header": {
+        "heightPx": 64,
+        "background": "#131A22"
+      },
+      "tabs": {
+        "heightPx": 48,
+        "activeIndicator": "#FF9900"
+      },
+      "conversationItemHeightPx": 72,
+      "bottomNavigationHeightPx": 64,
+      "avatarSizePx": 48,
+      "maxPinnedConversations": 5,
+      "unreadBadgeCap": "99+",
+      "listOrder": "atividade recente; conversas fixadas no topo",
+      "searchOrder": "relevância",
+      "tabsLabels": [
+        "Todos",
+        "Equipes",
+        "Favoritos"
+      ]
+    },
+    "conversa": {
+      "header": {
+        "heightPx": 64,
+        "background": "#131A22",
+        "cornerRadiusPx": 0
+      },
+      "dateSeparator": {
+        "heightPx": 32,
+        "background": "#E5E7EB",
+        "text": "#111827"
+      },
+      "receivedBubble": {
+        "background": "#FFFFFF",
+        "text": "#111827",
+        "border": "1px solid #E5E7EB",
+        "radiusPx": 16,
+        "paddingPx": 12
+      },
+      "sentBubble": {
+        "background": "#013A5B",
+        "text": "#FFFFFF",
+        "radiusPx": 16,
+        "paddingPx": 12
+      },
+      "messageEditWindowMinutes": 15,
+      "pdfOnly": true,
+      "maxPdfSizeMB": 10,
+      "messageHistoryRetention": "indefinite",
+      "attachmentControl": "plus",
+      "audioCalls": false,
+      "videoCalls": false,
+      "messageActions": [
+        "copy",
+        "reply",
+        "forward",
+        "edit",
+        "delete"
+      ],
+      "deleteScope": {
+        "value": null,
+        "status": "pending",
+        "note": "Definir se a exclusão será para quem exclui, para todos ou ambas as opções."
+      },
+      "previousEditVersions": {
+        "value": null,
+        "status": "not-defined"
+      }
+    }
+  },
+  "accessibility": {
+    "contrastMinimum": "4.5:1 para texto normal conforme WCAG 2.1 AA",
+    "minimumTouchTargetPx": 44,
+    "screenReader": "Rótulos descritivos para ícones, ações, estados e controles",
+    "keyboard": "Ordem lógica de foco e navegação por teclado"
+  },
+  "notes": [
+    "O controle de anexo da Tela Conversa é o sinal de mais (+), não um clipe de papel.",
+    "Apenas arquivos PDF são permitidos na conversa; limite de 10 MB por arquivo.",
+    "Não há chamadas de áudio ou vídeo.",
+    "A edição de mensagem enviada é permitida por até 15 minutos.",
+    "O histórico de mensagens tem retenção por prazo indeterminado.",
+    "O escopo da exclusão permanece pendente.",
+    "O histórico de versões anteriores de mensagens editadas não está definido.",
+    "O SVG lista-vazia.svg é o asset vetorial oficial para o estado de lista vazia.",
+    "Logotipos oficiais Amazon/Amazon News e arquivos de fonte proprietários não estão incluídos."
+  ]
+}
