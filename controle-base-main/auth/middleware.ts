@@ -22,6 +22,9 @@ export async function middleware(requisicao: NextRequest) {
     return NextResponse.redirect(new URL("/", requisicao.url), metodo === "GET" || metodo === "HEAD" ? 307 : 303);
   if (!permitido) return NextResponse.next({ request: requisicao });
 
+  // Prévia pública com dados fictícios: não expõe informações do banco.
+  if (rota === "/demo") return NextResponse.next({ request: requisicao });
+
   const { supabase, contexto } = criarServidorMiddleware(requisicao);
   const { decisao, ehAdmin } = await avaliarSessao(supabase);
   const plano = decidirRota(rota, metodo, decisao, ehAdmin);
