@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" role="img" aria-label="Copiar mensagem">
+  <rect x="3.5" y="3.5" width="12.5" height="15" rx="2.1"
+        fill="none" stroke="#131A22" stroke-width="1.8" stroke-linejoin="round"/>
+  <rect x="8" y="6.5" width="12.5" height="15" rx="2.1"
+        fill="#FFFFFF" stroke="#131A22" stroke-width="1.8" stroke-linejoin="round"/>
+</svg>
