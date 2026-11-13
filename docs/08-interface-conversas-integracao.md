@@ -21,4 +21,4 @@ O módulo de serviço do backend deve adaptar seus contratos para:
 Os tipos exportados em `design-em-react/telas/conversas.tsx` são o modelo de visualização da tela, não substituem os DTOs/API contracts oficiais do backend. Faça o mapeamento no adaptador da camada de controle, preservando os nomes e regras publicados pelo responsável pelo serviço.
 
 ## Limite atual
-Os contratos de serviço do chat atribuídos ao Pedro não foram encontrados na branch `main) durante esta implementação. Portanto, a tela e sua fronteira de integração estão preparadas, mas o fluxo ponta a ponta com dois usuários, persistência e recibos reais depende da conexão ao serviço oficial e de validação com duas contas de teste.
+Os contratos de serviço do chat atribuídos ao Pedro não foram encontrados na branch `main` durante esta implementação. Portanto, a tela e sua fronteira de integração estão preparadas, mas o fluxo ponta a ponta com dois usuários, persistência e recibos reais depende da conexão ao serviço oficial e de validação com duas contas de teste.
