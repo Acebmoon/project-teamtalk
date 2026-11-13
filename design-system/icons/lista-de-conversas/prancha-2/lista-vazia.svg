@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="72" height="60" viewBox="0 0 72 60"
+     fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Lista vazia</title>
+  <desc id="desc">Dois balões de conversa sobrepostos. O balão frontal tem três pontos.</desc>
+  <defs>
+    <linearGradient id="backFill" x1="30" y1="12" x2="59" y2="58" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8CC0FF"/>
+      <stop offset="1" stop-color="#5D9DF0"/>
+    </linearGradient>
+    <linearGradient id="frontFill" x1="10" y1="5" x2="48" y2="49" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F2F7FF"/>
+    </linearGradient>
+    <linearGradient id="outline" x1="5" y1="3" x2="52" y2="49" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#83B5F8"/>
+      <stop offset="1" stop-color="#4D91E9"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Balão posterior: deslocado para a direita e para baixo. -->
+  <path d="M32 13.5H58.2C64.1 13.5 68 17.4 68 23.1V41.3C68 47.1 64.1 51 58.2 51H54.1V58.1L43.7 51H32C26.1 51 22.2 47.1 22.2 41.3V23.1C22.2 17.4 26.1 13.5 32 13.5Z"
+        fill="url(#backFill)" stroke="#6EA8F2" stroke-width="1.7"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Balão frontal com contorno azul e cauda inferior esquerda. -->
+  <path d="M14.1 3.5H45.7C53 3.5 57.7 8.2 57.7 15.2V31.4C57.7 38.5 53 43.2 45.7 43.2H23.4L13.5 51.2V43.2H12.1C5.1 43.2 1.5 38.5 1.5 31.4V15.2C1.5 8.2 6.2 3.5 14.1 3.5Z"
+        fill="url(#frontFill)" stroke="url(#outline)" stroke-width="3.1"
+        stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Três pontos centralizados no balão frontal. -->
+  <circle cx="19.2" cy="23.1" r="2.35" fill="#5B9BEF"/>
+  <circle cx="29.7" cy="23.1" r="2.35" fill="#5B9BEF"/>
+  <circle cx="40.2" cy="23.1" r="2.35" fill="#5B9BEF"/>
+</svg>
