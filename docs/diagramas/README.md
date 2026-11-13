@@ -6,14 +6,14 @@ Esta pasta contém quatro diagramas que representam os principais comportamentos
 
 1. [Diagrama de caso de uso](01-caso-de-uso.md) — apresenta os atores e as funcionalidades disponíveis para Funcionário e Administrador da TI.
 2. [Diagrama de máquina de estados](02-maquina-de-estados.md) — representa o ciclo de vida de uma mensagem, desde o envio até a visualização, incluindo falha e tentativa de reenvio.
-3. **Diagrama de temporização:** [visualização Mermaid no GitHub](03-temporizacao.md) e [código-fonte PlantUML](03-temporizacao.puml) — oferece uma prévia visual diretamente no GitHub e mantém o diagrama UML editável em PlantUML.
+3. **Diagrama de temporização:** [visualização SVG no GitHub](03-temporizacao.md) e [código-fonte PlantUML](03-temporizacao.puml) — a imagem aparece diretamente no navegador, sem aplicativo externo.
 4. [Diagrama de atividades](04-atividades.md) — detalha o fluxo de envio de mensagem e arquivo PDF, incluindo validações e caminhos de erro.
 
 ## Como visualizar
 
 - Os arquivos .md contêm diagramas Mermaid, renderizados diretamente pelo GitHub.
-- O arquivo 03-temporizacao.md apresenta a visão visual simplificada da temporização no próprio GitHub.
-- O arquivo 03-temporizacao.puml contém o diagrama UML de temporização em PlantUML. Para renderizá-lo, use uma ferramenta compatível, como a extensão PlantUML do VS Code ou um renderizador PlantUML.
+- O arquivo 03-temporizacao.md incorpora uma imagem SVG, exibida diretamente na página do GitHub e no navegador, sem precisar de aplicativo externo.
+- O arquivo 03-temporizacao.puml contém o código-fonte editável em PlantUML. A visualização SVG é a opção recomendada para leitura rápida.
 
 ## Critérios de modelagem e limites
 
@@ -31,4 +31,4 @@ Esta pasta contém quatro diagramas que representam os principais comportamentos
 | Caso de uso | RF03–RF15, RN01–RN10, SEG01–SEG07 |
 | Máquina de estados | RF08–RF10, RF14, RNF06, RNF08, SEG03–SEG06 |
 | Temporização | RF08–RF10, RNF08, SEG03–SEG04; arquitetura de tempo real descrita em DIVISAO_TAREFAS.md |
-| Atividades | RF06, RF08–RF14, RN04–RN08, RNF11–RNF12, SEG04–SEG06 |
+| Atividades | RF06, RF08–RF14, RN04–RN08, RNF11–RN12, SEG04–SEG06 |
