@@ -32,6 +32,7 @@
 - O ícone de excluir usa vermelho de ação destrutiva.
 - O ícone de anexar PDF é o sinal de mais (+), conforme decisão aprovada.
 - O SVG `icons/lista-de-conversas/prancha-2/lista-vazia.svg` é o asset vetorial oficial para o estado de lista vazia e deve ser reutilizado onde esse estado aparecer.
+- [Visualizar a galeria HTML de ícones](http://htmlpreview.github.io/?https://github.com/Acebmoon/project-teamtalk/blob/feature/teamtalk-design-system/design-system/examples/icon-gallery.html) — página HTML com exemplos visuais dos ícones da biblioteca.
 
 ## Referências visuais incluídas
 
