@@ -1,0 +1,148 @@
+{
+  "package": "TeamTalk Approved UI Assets",
+  "version": "2.6",
+  "status": "approved_visual_assets",
+  "total_approved_svg_icons": 27,
+  "counts_by_board": {
+    "icons/lista-de-conversas/prancha-1": 9,
+    "icons/lista-de-conversas/prancha-2": 2,
+    "icons/tela-conversa/prancha-1": 11,
+    "icons/tela-conversa/prancha-2": 5
+  },
+  "icon_files": {
+    "icons/lista-de-conversas/prancha-1": [
+      "chats.svg",
+      "contacts.svg",
+      "files.svg",
+      "menu.svg",
+      "more.svg",
+      "new-conversation.svg",
+      "search.svg",
+      "unread-badge.svg",
+      "verified-badge.svg"
+    ],
+    "icons/lista-de-conversas/prancha-2": [
+      "erro-carregamento.svg",
+      "lista-vazia.svg"
+    ],
+    "icons/tela-conversa/prancha-1": [
+      "01_voltar.svg",
+      "02_mais_opcoes.svg",
+      "03_anexar_pdf.svg",
+      "04_emoji.svg",
+      "05_enviar.svg",
+      "06_arquivo_pdf.svg",
+      "07_enviada.svg",
+      "08_entregue_lida.svg",
+      "09_aguardando.svg",
+      "10_falha.svg",
+      "11_reenviar.svg"
+    ],
+    "icons/tela-conversa/prancha-2": [
+      "copiar-mensagem.svg",
+      "editar-mensagem.svg",
+      "encaminhar-mensagem.svg",
+      "excluir-mensagem.svg",
+      "responder-mensagem.svg"
+    ]
+  },
+  "notes": [
+    "Only user-approved functional SVG icons are included.",
+    "List empty and loading error icons belong to List of Conversations, Board 2.",
+    "Skeleton loading is a composed UI state and is not represented as a standalone SVG.",
+    "Conversation Board 2 copy icon uses the individually approved v4 SVG.",
+    "Amazon Ember font files and official Amazon/Amazon News logo assets are not bundled; verify licensing and obtain approved brand assets separately.",
+    "A imagem de visão geral registra telas apresentadas no material; não classifica por si só o status de desenvolvimento de cada tela.",
+    "The list-empty icon (icons/lista-de-conversas/prancha-2/lista-vazia.svg) was replaced with a clean vector reconstruction based on the approved Prancha 3 reference crop; two overlapping speech bubbles and three dots.",
+    "O SVG icons/lista-de-conversas/prancha-2/lista-vazia.svg é o asset vetorial oficial do estado vazio. As pranchas 2 e 3 aprovadas permanecem preservadas como referências visuais; a adoção do SVG no código do aplicativo será feita na implementação, sem reconstruir as imagens aprovadas.",
+    "A pasta references contém somente as imagens de referência em alta resolução 4x; arquivos originais e outras versões foram removidos conforme solicitado.",
+    "A pasta references contém somente as imagens aprovadas em alta resolução 4x. O README lista exclusivamente esses arquivos.",
+    "Tokens revisados e documentação de implementação/registro de decisões adicionados. Exclusão de mensagens continua pendente; histórico de versões editadas não está definido.",
+    "v2.5: README e documentação revisados para preparação de integração; tokens considerados revisados pelo usuário. Nenhuma alteração enviada ao GitHub.",
+    "v2.6: incluídos somente os dois documentos funcionais solicitados, em DOCX e PDF. TeamTalk_Especificacao_Funcional_UIUX_v1.0.docx foi renomeado para TeamTalk_Lista_de_Conversas.docx. TeamTalk_Squad_Handoff.docx foi excluído."
+  ],
+  "reference_images": [
+    {
+      "file": "references/visao-geral-do-projeto/visao-geral-das-telas-4x.png",
+      "description": "Versão ampliada em 4x para consulta em telas maiores e zoom.",
+      "dimensions_px": [
+        4796,
+        5248
+      ],
+      "processing": "Redimensionamento Lanczos com nitidez leve; não recupera detalhes ausentes no original."
+    },
+    {
+      "file": "references/lista-de-conversas/prancha-1-design-visual-reconstrucao-4x.png",
+      "description": "Prancha 1 — Design Visual da Lista de Conversas, reconstrução em alta resolução, aprovada pelo usuário.",
+      "dimensions_px": [
+        4796,
+        5248
+      ],
+      "status": "approved",
+      "source": "Reconstrução visual baseada na referência enviada pelo usuário; aprovada nesta conversa."
+    },
+    {
+      "file": "references/lista-de-conversas/prancha-2-estados-interacoes-reconstrucao-4x.png",
+      "description": "Prancha 2 — Estados e Interações da Lista de Conversas, reconstrução em alta resolução aprovada pelo usuário.",
+      "dimensions_px": [
+        4796,
+        5248
+      ],
+      "status": "approved"
+    },
+    {
+      "file": "references/lista-de-conversas/prancha-3-regras-handoff-reconstrucao-4x.png",
+      "description": "Prancha 3 — Regras e Handoff da Lista de Conversas, reconstrução 4x aprovada pelo usuário.",
+      "dimensions_px": [
+        4796,
+        5248
+      ],
+      "status": "approved"
+    },
+    {
+      "file": "references/tela-conversa/prancha-1-design-visual-aprovada-4x.png",
+      "description": "Prancha 1 — Design Visual da Tela Conversa, versão ampliada em 4x aprovada pelo usuário.",
+      "dimensions_px": [
+        4796,
+        5248
+      ],
+      "status": "approved"
+    },
+    {
+      "file": "references/tela-conversa/prancha-2-estados-interacoes-aprovada-4x.png",
+      "description": "Prancha 2 — Estados e Interações da Tela Conversa, versão ampliada em 4x aprovada pelo usuário.",
+      "dimensions_px": [
+        4796,
+        5248
+      ],
+      "status": "approved"
+    },
+    {
+      "file": "references/tela-conversa/prancha-3-regras-handoff-aprovada-4x.png",
+      "description": "Prancha 3 — Regras e Handoff da Tela Conversa, versão revisada de rodapé e alinhamentos, aprovada pelo usuário.",
+      "dimensions_px": [
+        7200,
+        7200
+      ],
+      "status": "approved"
+    }
+  ],
+  "approved_boards": [
+    "Lista de Conversas — Prancha 1: Design Visual",
+    "Lista de Conversas — Prancha 2: Estados e Interações",
+    "Lista de Conversas — Prancha 3: Regras e Handoff",
+    "Tela Conversa — Prancha 1: Design Visual",
+    "Tela Conversa — Prancha 2: Estados e Interações",
+    "Tela Conversa — Prancha 3: Regras e Handoff"
+  ],
+  "documentation": [
+    "documentation/lista-de-conversas/TeamTalk_Lista_de_Conversas.docx",
+    "documentation/lista-de-conversas/TeamTalk_Lista_de_Conversas.pdf",
+    "documentation/tela-conversa/TeamTalk_Conversa.docx",
+    "documentation/tela-conversa/TeamTalk_Conversa.pdf",
+    "handoff/GUIA_IMPLEMENTACAO_UIUX.md",
+    "handoff/REGISTRO_DE_DECISOES.md",
+    "tokens/teamtalk.tokens.json",
+    "tokens/teamtalk.css"
+  ]
+}
