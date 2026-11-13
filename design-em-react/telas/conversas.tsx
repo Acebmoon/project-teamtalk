@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import type { FormEvent } from "react";
 
 export type ConversaResumo = {
   id: string;
@@ -41,14 +42,6 @@ function horario(valor?: string) {
   return new Intl.DateTimeFormat("pt-BR", { hour: "2-digit", minute: "2-digit" }).format(data);
 }
 
-function dataMensagem(valor: string) {
-  const data = new Date(valor);
-  if (Number.isNaN(data.getTime())) return "";
-  const hoje = new Date();
-  if (data.toDateString() === hoje.toDateString()) return horario(valor);
-  return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" }).format(data);
-}
-
 export function TelaConversas({
   usuarioId,
   conversas,
@@ -60,12 +53,20 @@ export function TelaConversas({
   aoEnviarMensagem,
 }: Props) {
   const [texto, setTexto] = useState("");
+  const [busca, setBusca] = useState("");
   const [enviando, setEnviando] = useState(false);
   const conversaAtiva = conversas.find((conversa) => conversa.id === conversaAtivaId);
   const mensagensAtivas = useMemo(
     () => mensagens.filter((mensagem) => mensagem.conversaId === conversaAtivaId),
     [mensagens, conversaAtivaId],
   );
+  const conversasFiltradas = useMemo(() => {
+    const termo = busca.trim().toLocaleLowerCase("pt-BR");
+    return conversas.filter((conversa) =>
+      !termo || conversa.titulo.toLocaleLowerCase("pt-BR").includes(termo) ||
+      (conversa.ultimaMensagem ?? "").toLocaleLowerCase("pt-BR").includes(termo),
+    );
+  }, [conversas, busca]);
 
   async function enviar(evento: FormEvent<HTMLFormElement>) {
     evento.preventDefault();
@@ -92,7 +93,7 @@ export function TelaConversas({
         </header>
         <div className="chat-search">
           <span aria-hidden="true">⌕</span>
-          <input aria-label="Buscar conversas" placeholder="Buscar conversa" type="search" />
+          <input aria-label="Buscar conversas" placeholder="Buscar conversa" type="search" value={busca} onChange={(evento) => setBusca(evento.target.value)} />
         </div>
         <div className="chat-lista" aria-label="Lista de conversas">
           {carregando && <p className="chat-empty">Carregando conversas…</p>}
