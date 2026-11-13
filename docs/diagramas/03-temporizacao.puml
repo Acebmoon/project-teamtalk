@@ -1,0 +1,52 @@
+@startuml
+title TeamTalk — Diagrama de temporização do envio de mensagem
+caption Marcos temporais lógicos. Não representam segundos nem um SLA.
+
+robust "Estado da mensagem" as MSG
+concise "Aplicativo remetente" as REM
+concise "Servidor TeamTalk" as SRV
+concise "Aplicativo destinatário" as DEST
+
+@0
+MSG is "Preparada"
+REM is "Composição concluída"
+SRV is "Ocioso"
+DEST is "Aguardando"
+
+@10
+MSG is "Enviando"
+REM is "Envia requisição HTTPS"
+SRV is "Recebendo requisição"
+DEST is "Aguardando"
+
+@20
+MSG is "Em validação"
+REM is "Aguardando resposta"
+SRV is "Valida sessão, permissões e conteúdo"
+DEST is "Aguardando"
+
+@30
+MSG is "Enviada"
+REM is "Recebe confirmação"
+SRV is "Mensagem persistida"
+DEST is "Aguardando atualização"
+
+@40
+MSG is "Disponível na conversa"
+REM is "Exibe mensagem enviada"
+SRV is "Disponibiliza atualização em tempo real"
+DEST is "Recebe mensagem"
+
+@50
+MSG is "Visualizada"
+REM is "Recebe status de leitura"
+SRV is "Registra visualização"
+DEST is "Funcionário abre a conversa"
+
+@60
+MSG is "Visualizada"
+REM is "Status atualizado"
+SRV is "Operação concluída"
+DEST is "Mensagem exibida"
+
+@enduml
