@@ -15,6 +15,10 @@ Esta pasta reúne a documentação do Aplicativo Web de Comunicação Interna (T
 | [06 — Premissas e dependências](06-premissas-e-dependencias.md) | Responsabilidades e definições dependentes do cliente/equipe |
 | [07 — Fora do escopo inicial](07-fora-do-escopo.md) | Funcionalidades explicitamente excluídas do MVP |
 
+## Diagramas UML
+
+Consulte a pasta [diagramas](diagramas/README.md), que reúne os diagramas de caso de uso, máquina de estados, temporização e atividades, com explicações e rastreabilidade dos requisitos.
+
 ## Documento consolidado
 
 O documento completo permanece disponível em [Documento-de-Requisitos.md](Documento-de-Requisitos.md). Os arquivos separados organizam o mesmo conteúdo por seção; não substituem nem removem a versão consolidada.
