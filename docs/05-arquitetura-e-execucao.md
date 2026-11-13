@@ -23,7 +23,7 @@ flowchart LR
 
 | Item | Escolha e situação |
 |---|---|
-| Aplicação | Next.js 15, App Router, React 19 e TypeScript, presentes no `package.json` do workspace. |
+| Aplicação | Next.js com App Router, React e TypeScript, conforme a arquitetura documentada. |
 | Identidade e sessão | Supabase Auth, `@supabase/ssr` e cookies. |
 | Dados | Supabase PostgreSQL, migrations e RLS. |
 | Testes existentes | Vitest em funções puras de autenticação, rota, senha e dispositivo. |
