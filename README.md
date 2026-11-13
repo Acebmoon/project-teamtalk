@@ -25,6 +25,7 @@ A estimativa de escala é de aproximadamente **900 funcionários**. A Fase 1 ser
 
 ## Documentação do projeto
 
+- [Especificação integrada do TeamTalk: índice, casos de uso, arquitetura, dados, diagramas e rastreabilidade](docs/README.md)
 - [Documento de Especificação de Requisitos (versão atualmente presente na branch main)](docs/Documento-de-Requisitos.md)
 - [Divisão completa de tarefas, stack, estrutura, Issues, dependências e matriz de rastreabilidade](DIVISAO_TAREFAS.md)
 
