@@ -100,6 +100,9 @@ export function TelaConversas({
           {!carregando && conversas.length === 0 && (
             <p className="chat-empty">Suas conversas aparecerão aqui.</p>
           )}
+          {!carregando && conversas.length > 0 && conversasFiltradas.length === 0 && (
+            <p className="chat-empty">Nenhuma conversa encontrada.</p>
+          )}
           {conversasFiltradas.map((conversa) => (
             <button
               className={`chat-conversa ${conversa.id === conversaAtivaId ? "chat-conversa--ativa" : ""}`}
