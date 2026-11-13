@@ -10,43 +10,42 @@ Descrever o fluxo realizado por um funcionário para enviar uma mensagem no Team
 flowchart TD
     A((Início)) --> B["Funcionário abre uma conversa"]
     B --> C["Escreve a mensagem"]
-    C --> D{"Deseja anexar um arquivo?"}
+    C --> D["Aciona enviar"]
+    D --> E{"Sessão e permissões são válidas?"}
 
-    D -->|Não| H["Preparar envio de texto"]
-    D -->|Sim| E["Selecionar arquivo"]
-    E --> F["Enviar arquivo ao servidor"]
-    F --> G{"Arquivo é PDF válido e respeita o limite?"}
+    E -->|Não| F["Recusar operação e informar acesso negado"]
+    F --> Z((Fim))
 
-    G -->|Não| X["Exibir erro de arquivo"]
-    X --> E
-    G -->|Sim| H
+    E -->|Sim| G{"Deseja anexar um arquivo?"}
+    G -->|Não| L["Preparar mensagem de texto"]
+    G -->|Sim| H["Selecionar arquivo PDF"]
+    H --> I["Enviar arquivo ao servidor"]
+    I --> J{"Conteúdo é PDF válido e respeita o limite?"}
 
-    H --> I["Enviar mensagem ao servidor"]
-    I --> J{"Sessão e permissões são válidas?"}
+    J -->|Não| K["Exibir erro de arquivo"]
+    K --> H
+    J -->|Sim| L
 
-    J -->|Não| K["Recusar operação e informar acesso negado"]
-    K --> Z((Fim))
+    L --> M["Persistir mensagem no servidor"]
+    M --> N{"Persistência concluída?"}
 
-    J -->|Sim| L["Validar e persistir mensagem"]
-    L --> M{"Persistência concluída?"}
+    N -->|Não| O["Informar falha no envio"]
+    O --> P{"Funcionário deseja tentar novamente?"}
+    P -->|Sim| M
+    P -->|Não| Z
 
-    M -->|Não| N["Informar falha no envio"]
-    N --> O{"Funcionário deseja tentar novamente?"}
-    O -->|Sim| I
-    O -->|Não| Z
-
-    M -->|Sim| P["Disponibilizar mensagem na conversa"]
-    P --> Q["Destinatário abre a conversa"]
-    Q --> R["Registrar status de visualização"]
-    R --> S["Atualizar status para o remetente"]
-    S --> Z
+    N -->|Sim| Q["Disponibilizar mensagem na conversa"]
+    Q --> R["Destinatário abre a conversa"]
+    R --> S["Registrar status de visualização"]
+    S --> T["Atualizar status para o remetente"]
+    T --> Z
 ```
 
 ## Etapas do processo
 
-1. **Composição:** o funcionário abre uma conversa e escreve o conteúdo da mensagem.
-2. **Anexo opcional:** se selecionar um arquivo, o servidor verifica se o conteúdo é realmente PDF e se respeita o limite de tamanho definido pelo projeto.
-3. **Autorização:** antes de executar a operação protegida, o servidor valida a sessão e as permissões do usuário.
+1. **Composição:** o funcionário abre uma conversa, escreve o conteúdo e aciona o envio.
+2. **Autorização:** antes de executar a operação protegida, o servidor valida a sessão e as permissões do usuário.
+3. **Anexo opcional:** se houver arquivo, o servidor verifica se o conteúdo é realmente PDF e se respeita o limite de tamanho definido pelo projeto.
 4. **Persistência:** a mensagem é armazenada. Em caso de falha, o sistema informa o problema e permite uma nova tentativa.
 5. **Disponibilização:** após a confirmação do servidor, a mensagem fica disponível na conversa do destinatário.
 6. **Visualização:** quando o destinatário abre a conversa, o sistema registra e atualiza o status de visualização.
