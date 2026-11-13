@@ -241,3 +241,8 @@ button:focus-visible {
   .chat-mensagem { max-width: 88%; }
 }
 @media (prefers-reduced-motion: reduce) { .chat-app *, .chat-app *::before, .chat-app *::after { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Ajuste isolado da rota /demo, sem alterar as telas de produção. */
+.demo-teamtalk { height: 100svh; }
+.demo-teamtalk-aviso { min-height: 40px; padding: 10px 12px; color: #fff; background: #205449; font-size: 12px; font-weight: 700; text-align: center; }
+.demo-teamtalk .chat-app { height: calc(100svh - 40px); min-height: 0; }
