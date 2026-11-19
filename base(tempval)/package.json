@@ -17,10 +17,13 @@
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.49.1",
     "next": "^15.2.4",
+    "pdf-lib": "^1.17.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.17",
     "@eslint/eslintrc": "^3.3.0",
     "@types/node": "^22.13.10",
     "@types/react": "^19.0.10",

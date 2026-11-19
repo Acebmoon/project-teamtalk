@@ -14,6 +14,7 @@ Esta pasta reúne a documentação do Aplicativo Web de Comunicação Interna (T
 | [05 — Requisitos de segurança](05-requisitos-de-seguranca.md) | SEG01 a SEG07 |
 | [06 — Premissas e dependências](06-premissas-e-dependencias.md) | Responsabilidades e definições dependentes do cliente/equipe |
 | [07 — Fora do escopo inicial](07-fora-do-escopo.md) | Funcionalidades explicitamente excluídas do MVP |
+| [Contrato de anexos PDF](contratos-pdf.md) | Upload e download autenticados, configuração e integração do seletor da Issue #77 |
 
 ## Diagramas UML
 
