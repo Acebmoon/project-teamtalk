@@ -29,3 +29,22 @@ button { margin-top: 12px; padding: 12px; border: none; background: var(--cor-pr
 button:hover { background: var(--cor-primaria-hover); }
 :focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
 .erro { margin: 0; color: var(--cor-erro); font-size: 14px; }
+select { min-height: 48px; width: 100%; padding: 10px 12px; font: inherit; color: var(--cor-texto); background: var(--cor-superficie); border: 1px solid var(--cor-borda); border-radius: 8px; }
+button:disabled { opacity: .65; cursor: wait; }
+.admin-pagina { align-items: start; }
+.admin-painel { width: min(100%, 720px); overflow-wrap: anywhere; }
+.admin-painel h1 { margin-top: 18px; }
+.admin-painel a { color: var(--cor-primaria); display: inline-flex; min-height: 48px; align-items: center; }
+.admin-cadastro { border-block: 1px solid var(--cor-borda); padding-block: 16px; }
+.admin-cadastro summary { min-height: 48px; padding-block: 14px; cursor: pointer; font-weight: 700; }
+.admin-lista { list-style: none; padding: 0; }
+.admin-lista li { padding-block: 16px; border-bottom: 1px solid var(--cor-borda); }
+.admin-lista a { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
+.admin-status { display: inline-block; border-radius: 20px; padding: 6px 10px; background: var(--cor-fundo); margin-top: 12px; }
+.admin-paginacao { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.admin-dados { display: grid; gap: 8px; }
+.admin-dados dt { font-weight: 700; }
+.admin-dados dd { margin: 0 0 12px; }
+.admin-operacao { padding-block: 12px; border-bottom: 1px solid var(--cor-borda); }
+.admin-confirmacao { display: flex; align-items: center; gap: 12px; font-weight: 400; }
+.admin-confirmacao input { flex: 0 0 24px; width: 24px; min-height: 24px; }
