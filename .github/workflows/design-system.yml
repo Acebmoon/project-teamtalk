@@ -6,6 +6,8 @@ on:
   pull_request:
     branches: [main]
     paths:
+      - README.md
+      - docs/**
       - controle-base-main/**
       - design-em-react/**
       - base(tempval)/**

@@ -4,6 +4,17 @@ Esta pasta reúne a especificação do TeamTalk, aplicativo web de comunicação
 
 **MVP integrado (20/11/2026):** [fluxos reais, PRs preservados, migrations e validação](integracao-mvp.md).
 
+Estado atual pós-PR #110: [execução e variáveis no README](../README.md), [matriz completa de 46 requisitos](08-testes-e-rastreabilidade.md) e [backlog pós-MVP da #96](backlog-melhorias-futuras.md).
+
+## Homologação em campo
+
+- [#85 — Mobile e bloqueio desktop](qa/85-mobile-bloqueio-desktop.md)
+- [#86 — Autenticação, sessão e administração](qa/86-auth-sessao-admin.md)
+- [#87 — Chat, privacidade e leitura](qa/87-chat-privacidade-leitura.md)
+- [#88 — PDF e rastreabilidade](qa/88-pdf-rastreabilidade.md)
+
+As quatro issues continuam abertas. Os roteiros distinguem CI (936 testes + 12 mobile), smoke HTTP local da integração (49 checks) e evidências físicas ainda pendentes.
+
 ## Comece por aqui
 
 | Ordem | Arquivo | Para que serve |
@@ -37,7 +48,7 @@ Consulte a pasta [diagramas](diagramas/README.md), que reúne os diagramas de ca
 - **Funcionário** equivale ao papel de banco `employee`.
 - **Admin TI** equivale ao papel de banco `it_admin`.
 - **Fase 1** é a liberação para a Diretoria / nível estratégico. A expansão até cerca de 900 pessoas é gradual.
-- Os números de Issue no documento 08 correspondem às Issues #70–#88 no GitHub.
+- O documento 08 vincula as Issues #70–#88 e as entregas complementares #92, #96 e #98 aos PRs e casos de QA reais.
 
 ## Uso responsável
 
@@ -50,7 +61,7 @@ Fontes primárias preservadas: [Documento de Requisitos](Documento-de-Requisitos
 - Projeto: TeamTalk / Aplicativo Web de Comunicação Interna.
 - Requisitos de origem: versão 1.0, entrevista com o cliente.
 - Prazo do MVP: **20/11/2026**.
-- Estado documentado: base da `main` consultada em **13/11/2026**, com PR #90 integrado e as quatro migrations existentes.
+- Estado de implementação e aceite: `main` pós-PR #110, merge `9bcf20571a2b29605caab2b6e92f3f4d69f82990`, em **20/11/2026**, com 12 migrations. A matriz, o README e os roteiros refletem esse estado; capítulos de especificação conservam observações históricas, a interpretar junto do [relatório de integração](integracao-mvp.md).
 
 ## Contratos de implementação
 
