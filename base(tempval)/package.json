@@ -27,6 +27,7 @@
     "@types/react-dom": "^19.0.4",
     "eslint": "^9.22.0",
     "eslint-config-next": "^15.2.4",
+    "jsdom": "^26.1.0",
     "supabase": "^2.15.8",
     "typescript": "^5.8.2",
     "vitest": "^3.2.4"
