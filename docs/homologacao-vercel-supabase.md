@@ -1,6 +1,6 @@
 # Homologação TeamTalk — Vercel e Supabase
 
-Refs #92. Preparação reproduzível de um **Preview**, sem implantação em produção. Base: `main` em `31be7e74187256f26ff71c6c28830889b28e07c4`. Nenhum destino, domínio, credencial ou SLA foi presumido. A implantação remota e os testes em aparelhos reais dependem das decisões e evidências abaixo.
+Refs #92. Preparação reproduzível de um **Preview**, sem implantação em produção. Atualizado para a `main` pós-PR #110, merge `9bcf20571a2b29605caab2b6e92f3f4d69f82990`, em 20/11/2026. Registrar o destino/deployment e os parâmetros operacionais antes dos ensaios. A implantação remota e os testes em aparelhos reais exigem as evidências abaixo e os roteiros [#85](qa/85-mobile-bloqueio-desktop.md), [#86](qa/86-auth-sessao-admin.md), [#87](qa/87-chat-privacidade-leitura.md) e [#88](qa/88-pdf-rastreabilidade.md).
 
 ## 1. Registrar o destino
 
@@ -22,7 +22,7 @@ Usar dados sintéticos e contas controladas pela equipe. Não copiar dados/crede
 
 `base(tempval)/` permanece como workspace Next, com rotas finas. Configuração/validação ficam em `controle-base-main/configuracao/`. `design-em-react/` continua recebendo dados e ações por props, sem Supabase ou variáveis privadas.
 
-Os PRs #99 a #106 estavam **abertos** na consulta inicial de 20/11/2026. Foram consultados, não incorporados. A main entrega autenticação, primeiro acesso, bloqueio de dispositivo e RBAC mínimos; não marcar funções dos outros PRs como homologadas antes de integrá-las ao commit implantado.
+Os PRs #99 a #106 foram incorporados pelo #110, junto das telas, design system, Inbox e preferências. A tabela preserva os heads consultados/incorporados e as dependências. A main entrega os fluxos descritos no [relatório de integração](integracao-mvp.md); homologação operacional continua pendente, mesmo com código e CI integrados.
 
 | PR | SHA consultado | Dependência de homologação |
 | --- | --- | --- |
@@ -37,7 +37,7 @@ Os PRs #99 a #106 estavam **abertos** na consulta inicial de 20/11/2026. Foram c
 
 **Integração consolidada:** versões únicas e ordem final estão em [integração do MVP](integracao-mvp.md). As quatro migrations da main foram preservadas; as novas de PDF, contas, grupos e e-mail receberam versões 20261119003000, 20261119004000, 20261119005000 e 20261119006000. #100 precede #103. Não renumerar migrations aplicadas nem usar `migration repair` para esconder divergências. Reconciliar qualquer histórico existente com a equipe. O teste de contrato desta entrega reprova versões duplicadas no checkout.
 
-O #105 registra também duas asserções fechadas de publicação no #101 que precisam aceitar `message_reads`. Resolver na integração e executar a suíte combinada. Manter [contratos de autenticação](contratos-auth.md) e os contratos das frentes integradas.
+As asserções de publicação foram compatibilizadas no #110: a suíte combinada valida `messages` e `message_reads` com todas as migrations. Manter [contratos de autenticação](contratos-auth.md) e os contratos das frentes integradas.
 
 ## 3. Instalação e gates locais
 
@@ -221,22 +221,14 @@ Esperado: login acessível, API 401 sem sessão mobile e 403 JSON desktop. Repet
 
 Usar **A = Admin TI**, **B = funcionário**, e-mails controlados pela equipe e senhas individuais. Executar em Chrome Android e Safari iOS **físicos**, com versão de SO/navegador registrada.
 
-Na main, criar A/B pelo painel Auth (e-mail confirmado); o trigger cria perfis `pending` com `must_change_password=true`. No SQL Editor de homologação, substituir os UUIDs abaixo pelos IDs das contas de teste. Não alterar a marca de senha manualmente para pular o primeiro acesso:
+Criar apenas a conta inicial A pelo painel Auth (e-mail confirmado); o trigger cria perfil `pending` com `must_change_password=true`. No SQL Editor de homologação, substituir o UUID abaixo pelo ID de A. Não alterar a marca de senha manualmente para pular o primeiro acesso:
 
 ```sql
 update public.users set status = 'active', role = 'it_admin'
 where id = '<UUID_A>'::uuid;
-update public.users set status = 'active', role = 'employee'
-where id = '<UUID_B>'::uuid;
-update public.release_groups set is_enabled = true
-where name = 'Diretoria / nível estratégico';
-insert into public.release_group_members (release_group_id, user_id)
-select id, '<UUID_B>'::uuid from public.release_groups
-where name = 'Diretoria / nível estratégico'
-on conflict do nothing;
 ```
 
-Executar os testes de conta pending/sem grupo **antes** de aplicar a liberação correspondente. Após integrar #100/#103, preferir cadastro de B pelo painel TI; bootstrap de A continua operação administrativa controlada. Não criar cadastro público.
+Após A trocar a senha e entrar novamente, cadastrar B pelo painel TI para exercitar o e-mail real de primeiro acesso. Executar os testes de conta pending/sem grupo **antes** da liberação correspondente; ativar B e incluí-lo no grupo pelo painel. O [QA #86](qa/86-auth-sessao-admin.md) registra o preparo completo e o grupo `Diretoria - Fase 1` confirmado habilitado e sem membros em 20/11/2026 no projeto `pqpjnxymcngrackqrmnn`. A seed local original usa `Diretoria / nível estratégico`; escolher conscientemente o grupo da rodada, sem habilitar outros grupos por engano. Bootstrap de A continua operação administrativa controlada; não criar cadastro público.
 
 | Ensaio | Resultado esperado |
 | --- | --- |
@@ -245,13 +237,13 @@ Executar os testes de conta pending/sem grupo **antes** de aplicar a liberação
 | Primeiro login de A/B | Somente `/primeiro-acesso`; API protegida recebe 403 enquanto a troca estiver pendente |
 | Senha nova válida: 10+ caracteres e até 72 bytes | Trigger zera a marca após troca efetiva, logout global e novo login; senha provisória não autentica |
 | Reabrir/recarregar navegador | Cookies do domínio Secure em HTTPS e SameSite=Lax; sem tokens em localStorage/URL |
-| A/B em `/api/admin/estado` | A: 200 `{"papel":"it_admin"}`; B: 403 inclusive chamada direta. Na main, `/admin` redireciona B; frentes administrativas podem retornar página 403 conforme contrato |
+| A/B em `/api/admin/estado` | A: 200 `{"papel":"it_admin"}`; B: 403 inclusive chamada direta; `/admin` também nega funcionário com 403 conforme contrato |
 | Expiração com `SESSAO_MAX_HORAS=0.001`, novo deploy/login | Após o prazo, API 401/rota redireciona a login; restaurar `12` e refazer build |
 | Sair manualmente | Logout local; outra sessão independente permanece; rota protegida exige login |
 | Windows/macOS/Linux/iPad, incluindo TI | Página de bloqueio ou API 403; reduzir viewport não libera desktop |
 | Remover B do último grupo/bloqueá-lo durante a sessão | Próxima consulta negada, sem mensagens/PDFs; restaurar somente dados de teste no final |
 
-Para isolamento com duas contas, preparar por operação administrativa controlada uma conversa A↔B, outra só de A e outra só de B. B não lê a conversa exclusiva de A; TI não lê a exclusiva de B sem participar. Testar as frentes abaixo somente depois de integradas e conectadas à tela:
+Para isolamento com duas contas, preparar por operação administrativa controlada uma conversa A↔B e grupos de teste com um único participante, um só de A e outro só de B. B não lê a conversa exclusiva de A; TI não lê a exclusiva de B sem participar. A main já conecta as frentes abaixo; testar no SHA efetivamente implantado:
 
 | Frente | Ensaio adicional |
 | --- | --- |
@@ -263,7 +255,7 @@ Para isolamento com duas contas, preparar por operação administrativa controla
 
 ## 9. CI, observação e recuperação
 
-Na main consultada **não existe workflow em `.github/workflows/`**; a antiga #26 fechada não comprova pipeline ativo. Esta entrega executa gates no Build Vercel, mas não cria checks GitHub Actions/proteção de branch. Após conectar Vercel, verificar no PR o status/link Preview. Registrar como dependência qualquer exigência de workflow/check obrigatório da equipe. Build não substitui teste end-to-end ou garantia de disponibilidade.
+O workflow [Qualidade MVP e mobile](../.github/workflows/design-system.yml) está integrado e executa instalação reproduzível, typecheck, lint, Vitest, build e mobile. O [CI da main pós-#110](https://github.com/Acebmoon/project-teamtalk/actions/runs/44664059549) aprovou **936 testes em 47 arquivos e 12 mobile**; os **49 checks HTTP** foram smoke local documentado na integração, não uma etapa própria desse workflow. Mudanças em README/docs também disparam o CI de PR. Verificar os checks no SHA final de cada PR antes de mesclar; a existência do workflow não comprova configuração de proteção de branch. Após conectar Vercel, conferir separadamente o status/link do Preview. Build e emulação não substituem aparelhos físicos, serviços reais, carga ou garantia de disponibilidade.
 
 Após cada Preview, observar erros/latência na Vercel e falhas Auth/PostgREST/Realtime/Storage no Supabase; com #103, conferir entrega no provedor. Correlacionar por horário, deployment e IDs sanitizados, sem payloads pessoais. Acordar responsável, objetivos e alertas RNF10 antes de expandir o piloto; duas contas não comprovam capacidade para 900.
 
