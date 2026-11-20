@@ -1,12 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextRequest, NextResponse } from "next/server";
+import { obterAmbienteServidor } from "../configuracao/servidor";
 
 export function criarServidorMiddleware(requisicao: NextRequest) {
+  const { supabaseUrl, supabaseAnonKey } = obterAmbienteServidor();
   const contexto = { resposta: NextResponse.next({ request: requisicao }) };
   const opcoes = { secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/" };
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookieOptions: opcoes,
       cookies: {

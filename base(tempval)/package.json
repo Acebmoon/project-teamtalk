@@ -2,9 +2,11 @@
   "name": "project-teamtalk-base-tempval",
   "version": "0.1.0",
   "private": true,
+  "engines": { "node": "24.x" },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:homologacao": "npm run typecheck && npm run lint && npm test -- --maxWorkers=2 && npm run build",
     "start": "next start",
     "lint": "cd .. && eslint --config \"base(tempval)/eslint.config.mjs\" \"base(tempval)\" controle-base-main design-em-react",
     "typecheck": "tsc --noEmit",
@@ -18,7 +20,8 @@
     "@supabase/supabase-js": "^2.49.1",
     "next": "^15.2.4",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "server-only": "0.0.1"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.0",
