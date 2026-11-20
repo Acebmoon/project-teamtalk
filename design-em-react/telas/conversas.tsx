@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import type { FormEvent } from "react";
+import "./conversas.css";
 
 export type ConversaResumo = {
   id: string;
@@ -49,13 +50,19 @@ const preferenciaPadrao: PreferenciaInbox = {
   favorita: false,
 };
 
-type Props = {
+export type PropsConversas = {
   usuarioId: string;
   conversas: ConversaResumo[];
   mensagens: MensagemConversa[];
   conversaAtivaId?: string;
   carregando?: boolean;
   erro?: string;
+  preferenciasInbox: Record<string, PreferenciaInbox>;
+  carregandoPreferencias?: boolean;
+  salvandoPreferencias?: boolean;
+  erroPreferencias?: string;
+  aoAtualizarPreferencia: (conversaId: string, parcial: Partial<PreferenciaInbox>) => Promise<void>;
+  aoRecarregarPreferencias: () => void;
   aoSelecionarConversa: (conversaId: string) => void;
   aoEnviarMensagem: (conversaId: string, conteudo: string) => Promise<void>;
 };
@@ -76,7 +83,13 @@ export function TelaConversas({
   erro,
   aoSelecionarConversa,
   aoEnviarMensagem,
-}: Props) {
+  preferenciasInbox,
+  carregandoPreferencias = false,
+  salvandoPreferencias = false,
+  erroPreferencias,
+  aoAtualizarPreferencia,
+  aoRecarregarPreferencias,
+}: PropsConversas) {
   const [texto, setTexto] = useState("");
   const [busca, setBusca] = useState("");
   const [enviando, setEnviando] = useState(false);
@@ -86,16 +99,20 @@ export function TelaConversas({
   const [filtro, setFiltro] = useState<"todas" | "prioridade" | "nao-lidas">("todas");
   const [tema, setTema] = useState<"escuro" | "claro">("escuro");
 
-  // A organização pessoal é temporária neste incremento: sem persistência ou transmissão ao servidor.
-  // Reiniciar evita compartilhar preferências entre usuários no mesmo navegador.
-  const [organizacao, setOrganizacao] = useState<Record<string, PreferenciaInbox>>({});
-  useEffect(() => { setOrganizacao({}); setErroEnvio(""); }, [usuarioId]);
+  // O controle injeta apenas preferências confirmadas pelo servidor.
+  const organizacao = preferenciasInbox;
+  const [erroOrganizacao, setErroOrganizacao] = useState("");
+  useEffect(() => { setErroEnvio(""); setErroOrganizacao(""); }, [usuarioId]);
+  const bloqueandoPreferencias = carregandoPreferencias || salvandoPreferencias || !!erroPreferencias;
   const preferencia = (id: string): PreferenciaInbox => organizacao[id] ?? preferenciaPadrao;
-  function atualizarPreferencia(id: string, parcial: Partial<PreferenciaInbox>) {
-    setOrganizacao((anterior) => ({
-      ...anterior,
-      [id]: { ...preferenciaPadrao, ...anterior[id], ...parcial },
-    }));
+  async function atualizarPreferencia(id: string, parcial: Partial<PreferenciaInbox>) {
+    if (bloqueandoPreferencias) return;
+    setErroOrganizacao("");
+    try {
+      await aoAtualizarPreferencia(id, parcial);
+    } catch {
+      setErroOrganizacao("Não foi possível salvar a organização. Tente novamente.");
+    }
   }
   const conversaAtiva = conversas.find((conversa) => conversa.id === conversaAtivaId);
   const mensagensAtivas = useMemo(
@@ -186,6 +203,7 @@ export function TelaConversas({
             <span className="sr-only">Prioridade de {conversa.titulo}</span>
             <select
               aria-label={"Prioridade de " + conversa.titulo}
+              disabled={bloqueandoPreferencias}
               value={pref.prioridade}
               onChange={(e) => atualizarPreferencia(conversa.id, { prioridade: e.target.value as PrioridadeInbox })}
             >
@@ -196,6 +214,7 @@ export function TelaConversas({
             <span className="sr-only">Situação de {conversa.titulo}</span>
             <select
               aria-label={"Situação de " + conversa.titulo}
+              disabled={bloqueandoPreferencias}
               value={pref.situacao}
               onChange={(e) => atualizarPreferencia(conversa.id, { situacao: e.target.value as SituacaoInbox })}
             >
@@ -205,6 +224,7 @@ export function TelaConversas({
           <button
             type="button"
             className={"workspace-favorito" + (pref.favorita ? " workspace-favorito--ativo" : "")}
+            disabled={bloqueandoPreferencias}
             aria-pressed={pref.favorita}
             aria-label={(pref.favorita ? "Remover do foco: " : "Adicionar ao foco: ") + conversa.titulo}
             onClick={() => atualizarPreferencia(conversa.id, { favorita: !pref.favorita })}
@@ -247,6 +267,16 @@ export function TelaConversas({
             <button type="button" className={filtro === "nao-lidas" ? "ativo" : ""} aria-pressed={filtro === "nao-lidas"} onClick={() => setFiltro("nao-lidas")}>Não lidas</button>
           </div>
         </div>
+        {carregandoPreferencias && <p role="status">Carregando sua organização…</p>}
+        {salvandoPreferencias && <p role="status">Salvando organização…</p>}
+        {(erroPreferencias || erroOrganizacao) && (
+          <div role="alert">
+            <p>{erroPreferencias || erroOrganizacao}</p>
+            <button type="button" onClick={() => { setErroOrganizacao(""); aoRecarregarPreferencias(); }}>
+              Tentar novamente
+            </button>
+          </div>
+        )}
         <div className={"chat-lista workspace-lista" + (vista === "quadro" ? " workspace-lista--quadro" : "")} aria-label="Conversas organizadas">
           {carregando && <p className="chat-empty">Carregando conversas…</p>}
           {!carregando && conversas.length === 0 && <p className="chat-empty">Suas conversas aparecerão aqui.</p>}

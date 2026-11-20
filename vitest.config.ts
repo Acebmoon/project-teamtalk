@@ -10,6 +10,7 @@ export default defineConfig({
     },
   },
   test: {
+    maxWorkers: 2,
     exclude: [...configDefaults.exclude, "design-em-react/testes/mobile.test.ts"],
   },
 });
