@@ -1,7 +1,12 @@
-import { carregarPainelAdmin } from "@controle/admin/painel";
-import { TelaAdmin } from "@design/telas/admin";
+import { carregarPainelAdmin, mensagemErroPagina, type ParametrosPainel } from "@controle/admin/painel";
+import { criarConta } from "@controle/admin/acoes";
+import { TelaAdmin, TelaErroAdmin } from "@design/telas/admin";
 
-export default async function PaginaAdmin() {
-  const { nome } = await carregarPainelAdmin();
-  return <TelaAdmin nome={nome} />;
+export const dynamic = "force-dynamic";
+
+export default async function PaginaAdmin({ searchParams }: { searchParams: ParametrosPainel }) {
+  try {
+    const dados = await carregarPainelAdmin(searchParams);
+    return <TelaAdmin {...dados} criarConta={criarConta} />;
+  } catch (erro) { return <TelaErroAdmin mensagem={mensagemErroPagina(erro)} />; }
 }
