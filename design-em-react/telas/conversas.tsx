@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import type { FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { FormEvent, ReactNode, Ref } from "react";
+import { Icone } from "@design/icones/icone";
+import { SeletorAnexoPdf } from "@design/componentes/seletor-anexo-pdf";
 import "./conversas.css";
 
 export type ConversaResumo = {
@@ -24,6 +26,9 @@ export type MensagemConversa = {
   conteudo: string;
   criadaEm: string;
   estado: "enviando" | "enviada" | "lida" | "falha";
+  downloadUrl?: string;
+  nomeArquivo?: string;
+  leituras?: { usuarioId: string; lidaEm: string | null }[];
 };
 
 export type SituacaoInbox = "acompanhar" | "em-conversa" | "concluida";
@@ -65,6 +70,16 @@ export type PropsConversas = {
   aoRecarregarPreferencias: () => void;
   aoSelecionarConversa: (conversaId: string) => void;
   aoEnviarMensagem: (conversaId: string, conteudo: string) => Promise<void>;
+  aoEnviarPdf?: (conversaId: string, arquivo: File) => Promise<void>;
+  pdfMaxBytes?: number;
+  carregandoMensagens?: boolean;
+  maisConversas?: boolean;
+  maisMensagens?: boolean;
+  aoCarregarMaisConversas?: () => void;
+  aoCarregarMaisMensagens?: () => void;
+  aoRecarregar?: () => void;
+  renderizarMensagem?: (mensagem: MensagemConversa) => ReactNode;
+  acoesConta?: ReactNode;
 };
 
 function horario(valor?: string) {
@@ -89,20 +104,26 @@ export function TelaConversas({
   erroPreferencias,
   aoAtualizarPreferencia,
   aoRecarregarPreferencias,
+  aoEnviarPdf, pdfMaxBytes = 4000000, carregandoMensagens = carregando,
+  maisConversas, maisMensagens, aoCarregarMaisConversas, aoCarregarMaisMensagens,
+  aoRecarregar, renderizarMensagem, acoesConta,
 }: PropsConversas) {
+  const historicoRef = useRef<HTMLDivElement>(null);
   const [texto, setTexto] = useState("");
+  const [arquivo, setArquivo] = useState<File | null>(null);
   const [busca, setBusca] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [erroEnvio, setErroEnvio] = useState("");
   const [area, setArea] = useState<"inbox" | "equipes" | "foco">("inbox");
   const [vista, setVista] = useState<"lista" | "quadro">("lista");
   const [filtro, setFiltro] = useState<"todas" | "prioridade" | "nao-lidas">("todas");
-  const [tema, setTema] = useState<"escuro" | "claro">("escuro");
+  const [tema, setTema] = useState<"escuro" | "claro">("claro");
 
   // O controle injeta apenas preferências confirmadas pelo servidor.
   const organizacao = preferenciasInbox;
   const [erroOrganizacao, setErroOrganizacao] = useState("");
   useEffect(() => { setErroEnvio(""); setErroOrganizacao(""); }, [usuarioId]);
+  useEffect(() => { setTexto(""); setArquivo(null); setErroEnvio(""); }, [conversaAtivaId]);
   const bloqueandoPreferencias = carregandoPreferencias || salvandoPreferencias || !!erroPreferencias;
   const preferencia = (id: string): PreferenciaInbox => organizacao[id] ?? preferenciaPadrao;
   async function atualizarPreferencia(id: string, parcial: Partial<PreferenciaInbox>) {
@@ -119,6 +140,11 @@ export function TelaConversas({
     () => mensagens.filter((mensagem) => mensagem.conversaId === conversaAtivaId),
     [mensagens, conversaAtivaId],
   );
+  const ultimaMensagemId = mensagensAtivas.at(-1)?.id;
+  useEffect(() => {
+    const elemento = historicoRef.current;
+    if (elemento) elemento.scrollTop = elemento.scrollHeight;
+  }, [conversaAtivaId, ultimaMensagemId]);
   const conversasFiltradas = useMemo(() => {
     const termo = busca.trim().toLocaleLowerCase("pt-BR");
     return conversas.filter((conversa) => {
@@ -167,6 +193,14 @@ export function TelaConversas({
     } finally {
       setEnviando(false);
     }
+  }
+
+  async function enviarArquivo() {
+    if (!arquivo || !conversaAtivaId || !aoEnviarPdf || enviando) return;
+    setEnviando(true); setErroEnvio("");
+    try { await aoEnviarPdf(conversaAtivaId, arquivo); setArquivo(null); }
+    catch { setErroEnvio("Não foi possível enviar o PDF. Tente novamente."); }
+    finally { setEnviando(false); }
   }
 
   function renderConversa(conversa: ConversaResumo) {
@@ -244,6 +278,7 @@ export function TelaConversas({
             {tema === "escuro" ? "☼" : "☾"}
           </button>
         </header>
+        {acoesConta && <div className="workspace-conta">{acoesConta}</div>}
         <div className="workspace-titulo">
           <span className="chat-eyebrow">WORKSPACE</span>
           <div className="workspace-titulo__linha">
@@ -253,7 +288,7 @@ export function TelaConversas({
           <p>{area === "equipes" ? "Comunicação por departamento." : area === "foco" ? "Suas conversas prioritárias." : "O que merece atenção, organizado."}</p>
         </div>
         <div className="chat-search workspace-busca">
-          <span aria-hidden="true">⌕</span>
+          <Icone nome="busca" />
           <input aria-label="Buscar conversas ou equipes" placeholder="Buscar conversa ou equipe" type="search" value={busca} onChange={(e) => setBusca(e.target.value)} />
         </div>
         <div className="workspace-ferramentas">
@@ -279,7 +314,7 @@ export function TelaConversas({
         )}
         <div className={"chat-lista workspace-lista" + (vista === "quadro" ? " workspace-lista--quadro" : "")} aria-label="Conversas organizadas">
           {carregando && <p className="chat-empty">Carregando conversas…</p>}
-          {!carregando && conversas.length === 0 && <p className="chat-empty">Suas conversas aparecerão aqui.</p>}
+          {!carregando && conversas.length === 0 && <p className="chat-empty"><Icone nome="lista-vazia" />Suas conversas aparecerão aqui.</p>}
           {!carregando && conversas.length > 0 && conversasFiltradas.length === 0 && <p className="chat-empty">Nenhuma conversa neste filtro.</p>}
           {!carregando && grupos.filter((grupo) => grupo.itens.length > 0).map((grupo) => (
             <section className="workspace-grupo" key={grupo.titulo} aria-label={grupo.titulo}>
@@ -288,9 +323,11 @@ export function TelaConversas({
             </section>
           ))}
         </div>
+        {maisConversas && <button type="button" disabled={carregando} onClick={aoCarregarMaisConversas}>Carregar mais conversas</button>}
+        {erro && !conversaAtiva && <div className="chat-erro" role="alert"><Icone nome="erro" />{erro}<button type="button" onClick={aoRecarregar}>Tentar novamente</button></div>}
         <nav className="workspace-nav" aria-label="Seções do workspace">
-          <button type="button" className={area === "inbox" ? "ativo" : ""} aria-current={area === "inbox" ? "page" : undefined} onClick={() => setArea("inbox")}><span aria-hidden="true">▤</span>Inbox</button>
-          <button type="button" className={area === "equipes" ? "ativo" : ""} aria-current={area === "equipes" ? "page" : undefined} onClick={() => setArea("equipes")}><span aria-hidden="true">▦</span>Equipes</button>
+          <button type="button" className={area === "inbox" ? "ativo" : ""} aria-current={area === "inbox" ? "page" : undefined} onClick={() => setArea("inbox")}><Icone nome="inbox" />Inbox</button>
+          <button type="button" className={area === "equipes" ? "ativo" : ""} aria-current={area === "equipes" ? "page" : undefined} onClick={() => setArea("equipes")}><Icone nome="equipes" />Equipes</button>
           <button type="button" className={area === "foco" ? "ativo" : ""} aria-current={area === "foco" ? "page" : undefined} onClick={() => setArea("foco")}><span aria-hidden="true">◎</span>Em foco</button>
         </nav>
       </aside>
@@ -299,46 +336,35 @@ export function TelaConversas({
         {conversaAtiva ? (
           <>
             <header className="chat-header">
-              <button className="chat-voltar" type="button" onClick={() => aoSelecionarConversa("")} aria-label="Voltar para conversas">‹</button>
+              <button className="chat-voltar" type="button" onClick={() => aoSelecionarConversa("")} aria-label="Voltar para conversas"><Icone nome="voltar" /></button>
               <span className="chat-avatar chat-avatar--header" aria-hidden="true">{conversaAtiva.avatarTexto}</span>
               <div className="chat-header__identidade">
                 <h2>{conversaAtiva.titulo}</h2>
                 <span>{conversaAtiva.online ? "Disponível" : conversaAtiva.subtitulo ?? "Conversa"}</span>
               </div>
-              <button className="chat-mais" type="button" aria-label="Mais opções" disabled>•••</button>
+
             </header>
 
-            <div className="chat-historico" aria-live="polite" aria-relevant="additions text">
-              {mensagensAtivas.length === 0 && !carregando && (
+            <div ref={historicoRef} className="chat-historico" aria-live="polite" aria-relevant="additions text">
+              {mensagensAtivas.length === 0 && !carregandoMensagens && (
                 <div className="chat-historico-vazio">
                   <span aria-hidden="true">✦</span>
                   <strong>Esta conversa está começando</strong>
                   <p>Envie uma mensagem para iniciar o diálogo.</p>
                 </div>
               )}
-              {mensagensAtivas.map((mensagem) => {
-                const propria = mensagem.remetenteId === usuarioId;
-                return (
-                  <article className={`chat-mensagem ${propria ? "chat-mensagem--propria" : "chat-mensagem--recebida"}`} key={mensagem.id}>
-                    {!propria && <span className="chat-mensagem__autor">{mensagem.remetenteNome}</span>}
-                    <div className="chat-balao">
-                      <p>{mensagem.conteudo}</p>
-                      <footer>
-                        <time dateTime={mensagem.criadaEm}>{horario(mensagem.criadaEm)}</time>
-                        {propria && (
-                          <span className={`chat-recibo chat-recibo--${mensagem.estado}`} aria-label={mensagem.estado === "lida" ? "Mensagem lida" : mensagem.estado === "enviada" ? "Mensagem enviada" : mensagem.estado === "falha" ? "Falha no envio" : "Enviando"}>
-                            {mensagem.estado === "lida" ? "✓✓" : mensagem.estado === "enviada" ? "✓" : mensagem.estado === "falha" ? "!" : "…"}
-                          </span>
-                        )}
-                      </footer>
-                    </div>
-                  </article>
-                );
-              })}
-              {carregando && <p className="chat-empty">Carregando mensagens…</p>}
+              {maisMensagens && <button type="button" disabled={carregandoMensagens} onClick={aoCarregarMaisMensagens}>Carregar mensagens anteriores</button>}
+              {mensagensAtivas.map((mensagem) => renderizarMensagem
+                ? renderizarMensagem(mensagem)
+                : <BalaoMensagem key={mensagem.id} mensagem={mensagem} usuarioId={usuarioId} />)}
+              {carregandoMensagens && <p className="chat-empty">Carregando mensagens…</p>}
             </div>
 
-            {(erro || erroEnvio) && <p className="chat-erro" role="alert">{erroEnvio || erro}</p>}
+            {(erro || erroEnvio) && <div className="chat-erro" role="alert"><Icone nome="erro" />{erroEnvio || erro}{aoRecarregar && <button type="button" onClick={aoRecarregar}>Tentar novamente</button>}</div>}
+            {aoEnviarPdf && <div className="chat-anexo">
+              <SeletorAnexoPdf key={conversaAtivaId} arquivo={arquivo} limiteMaximoBytes={pdfMaxBytes} aoAlterarArquivo={setArquivo} desabilitado={enviando} />
+              {arquivo && <button type="button" disabled={enviando} onClick={enviarArquivo}><Icone nome="enviar" />Enviar PDF</button>}
+            </div>}
             <form className="chat-compositor" onSubmit={enviar}>
               <label className="chat-compositor__campo">
                 <span className="sr-only">Escreva uma mensagem</span>
@@ -352,7 +378,7 @@ export function TelaConversas({
                 />
               </label>
               <button className="chat-enviar" type="submit" disabled={!texto.trim() || enviando} aria-label="Enviar mensagem">
-                {enviando ? "…" : "➤"}
+                <Icone nome={enviando ? "aguardando" : "enviar"} />
               </button>
             </form>
           </>
@@ -366,4 +392,29 @@ export function TelaConversas({
       </section>
     </main>
   );
+}
+
+
+/** Balão puro: o controle fornece o ref que observa a exibição efetiva. */
+export function BalaoMensagem({ mensagem, usuarioId, referencia }: {
+  mensagem: MensagemConversa; usuarioId: string; referencia?: Ref<HTMLElement>;
+}) {
+  const propria = mensagem.remetenteId === usuarioId;
+  return <article ref={referencia} className={`chat-mensagem ${propria ? "chat-mensagem--propria" : "chat-mensagem--recebida"}`}>
+    {!propria && <span className="chat-mensagem__autor">{mensagem.remetenteNome}</span>}
+    <div className="chat-balao">
+      {mensagem.downloadUrl
+        ? <a className="chat-download" href={mensagem.downloadUrl}><Icone nome="arquivo-pdf" />{mensagem.nomeArquivo || "Baixar PDF"}</a>
+        : <p>{mensagem.conteudo}</p>}
+      <footer>
+        <time dateTime={mensagem.criadaEm}>{horario(mensagem.criadaEm)}</time>
+        {propria && <span className={`chat-recibo chat-recibo--${mensagem.estado}`} aria-label={mensagem.estado === "lida" ? "Mensagem lida" : mensagem.estado === "enviada" ? "Mensagem enviada" : mensagem.estado === "falha" ? "Falha no envio" : "Enviando"}>
+          <Icone nome={mensagem.estado === "enviando" ? "aguardando" : mensagem.estado} width={16} height={16} />
+        </span>}
+      </footer>
+      {propria && !!mensagem.leituras?.length && <details className="chat-leituras"><summary>Leituras por destinatário</summary><ul>
+        {mensagem.leituras.map((leitura) => <li key={leitura.usuarioId}>Participante {leitura.usuarioId.slice(0, 8)}: {leitura.lidaEm ? <>lida às <time dateTime={leitura.lidaEm}>{horario(leitura.lidaEm)}</time></> : "não lida"}</li>)}
+      </ul></details>}
+    </div>
+  </article>;
 }

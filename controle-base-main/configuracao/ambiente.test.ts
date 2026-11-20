@@ -90,6 +90,7 @@ describe("ambiente de servidor", () => {
 
   it("verifica limite PDF explícito contra o transporte da Vercel", () => {
     expect(validarAmbienteServidor({ ...base, VERCEL: "1", PDF_MAX_BYTES: "4000000" }).pdfMaxBytes).toBe(4000000);
+    expect(validarAmbienteServidor({ ...base, VERCEL: "1" }).pdfMaxBytes).toBe(4000000);
     expect(() => validarAmbienteServidor({ ...base, VERCEL: "1", PDF_MAX_BYTES: "10485760" })).toThrow("PDF_MAX_BYTES");
     expect(() => validarAmbienteServidor({ ...base, PDF_MAX_BYTES: "10485760" })).not.toThrow();
   });

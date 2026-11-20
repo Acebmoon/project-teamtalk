@@ -1,5 +1,7 @@
 # Workspace TeamTalk inspirado no Linear — fase 1
 
+> Atualização de 20/11/2026: o [MVP integrado](integracao-mvp.md) conecta a rota inicial à Inbox, aos endpoints de texto/PDF/leituras e à persistência de preferências. As observações de implementação isolada abaixo registram a entrega original; o guia consolidado descreve o estado atual.
+
 ## Objetivo
 Transformar a tela de conversas em uma Inbox organizada sem transformar o TeamTalk em gerenciador de tarefas. O chat permanece como função principal.
 Board de fluxos do Miro: https://miro.com/app/board/uXjVEOOsutU=/

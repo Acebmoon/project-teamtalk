@@ -1,5 +1,5 @@
 /* TeamTalk — interface de conversas mobile-first */
-.chat-app { display: flex; width: 100%; height: 100svh; min-height: 560px; overflow: hidden; background: #f7faf8; color: #183b35; font-family: Inter, ui-sans-serif, system-ui, sans-serif; }
+.chat-app { display: flex; width: 100%; height: 100vh; height: 100svh; height: 100dvh; min-height: 0; overflow: hidden; background: #f7faf8; color: #183b35; font-family: var(--fonte-familia); }
 .chat-sidebar { display: flex; flex: 0 0 360px; flex-direction: column; min-width: 0; border-right: 1px solid #dce7e2; background: #fff; }
 .chat-sidebar__topo { display: flex; align-items: center; justify-content: space-between; padding: 26px 22px 18px; }
 .chat-eyebrow { color: #6b8279; font-size: 10px; font-weight: 800; letter-spacing: .13em; }
@@ -207,3 +207,29 @@
 /* Controles da organização pessoal durante leitura/gravação. */
 .workspace button:disabled, .workspace select:disabled { cursor: wait; opacity: .6; }
 .workspace-sidebar > [role="status"], .workspace-sidebar > [role="alert"] { margin: 8px 18px; }
+
+/* Composição MVP: tokens centrais, toque, teclado móvel e anexos autenticados. */
+.workspace--claro { --ws-fundo: var(--cor-fundo); --ws-painel: var(--cor-superficie); --ws-texto: var(--cor-texto); --ws-muted: var(--cor-secundaria); --ws-borda: var(--cor-borda); }
+.workspace button, .workspace select, .workspace a { min-height: var(--toque-minimo); }
+.workspace button { margin-top: 0; }
+.workspace .chat-voltar { flex: 0 0 44px; width: 44px; }
+.workspace-conta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; padding: 8px 16px; border-bottom: 1px solid var(--ws-borda); font-size: 12px; }
+.workspace-conta > span { flex: 1; overflow-wrap: anywhere; }
+.workspace-conta a, .chat-download { display: inline-flex; align-items: center; gap: 8px; color: var(--cor-primaria); }
+.workspace--escuro .workspace-conta a, .workspace--escuro .chat-download { color: #a9e5d2; }
+.workspace-conta form { margin: 0; }
+.workspace-conta button { width: auto; }
+.workspace .chat-main { min-height: 0; }
+.workspace .chat-historico { min-height: 0; overscroll-behavior: contain; }
+.workspace .chat-header { padding-top: max(12px, env(safe-area-inset-top, 0px)); }
+.workspace .chat-search input { font-size: 16px; min-height: 44px; }
+.workspace .chat-search input:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
+.workspace .chat-enviar { flex-basis: 48px; width: 48px; min-height: 48px; }
+.chat-anexo { flex: 0 1 auto; max-height: 35svh; overflow: auto; padding: 8px 12px; border-top: 1px solid var(--ws-borda); background: var(--cor-superficie); color: var(--cor-texto); }
+.chat-anexo > button { display: flex; align-items: center; justify-content: center; gap: 8px; }
+.chat-leituras { margin-top: 8px; font-size: 12px; }
+.chat-leituras summary { padding: 12px 0; min-height: 44px; cursor: pointer; }
+.chat-leituras ul { margin: 0; padding-left: 16px; }
+.workspace .chat-empty svg { display: block; margin: 0 auto 12px; }
+.chat-erro svg { vertical-align: middle; margin-right: 8px; }
+.admin-painel nav a { padding-inline: 4px; }

@@ -16,7 +16,7 @@ Leituras de contas usam o cliente de sessão, respeitando RLS. O cliente privile
 
 1. Na raiz, executar `npm install`.
 2. Configurar em `base(tempval)/.env.local` a URL, chave pública e `SUPABASE_SERVICE_ROLE_KEY` conforme `.env.example`. A chave de serviço deve existir apenas no ambiente de servidor, sem prefixo `NEXT_PUBLIC_`.
-3. Aplicar a nova migration `20261119000000_admin_accounts.sql`, depois das quatro migrations existentes, no ambiente de desenvolvimento/homologação. Em Supabase local descartável, `npm run db:reset` aplica a sequência completa.
+3. Aplicar a nova migration `20261119004000_admin_accounts.sql`, depois das quatro migrations existentes, no ambiente de desenvolvimento/homologação. Em Supabase local descartável, `npm run db:reset` aplica a sequência completa.
 4. Manter `auth.enable_signup = false`, já presente em `supabase/config.toml`; no Supabase hospedado, manter também o cadastro público desabilitado nas configurações de Auth. O aplicativo não contém fluxo de autorregistro.
 5. Acessar por Chrome Android ou Safari iPhone com um Admin TI ativo e senha definitiva. A regra mobile também vale para TI.
 

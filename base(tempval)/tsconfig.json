@@ -27,6 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     "../controle-base-main/**/*.ts",
+    "../controle-base-main/**/*.tsx",
     "../design-em-react/**/*.ts",
     "../design-em-react/**/*.tsx"
   ],

@@ -27,15 +27,15 @@ Os PRs #99 a #106 estavam **abertos** na consulta inicial de 20/11/2026. Foram c
 | PR | SHA consultado | Dependência de homologação |
 | --- | --- | --- |
 | [#99](https://github.com/Acebmoon/project-teamtalk/pull/99) | `4126271` | Listagem; `20261119000000_list_authorized_conversations.sql` |
-| [#100](https://github.com/Acebmoon/project-teamtalk/pull/100) | `88408db` | Contas TI; `20261119000000_admin_accounts.sql`; chave privada de serviço |
+| [#100](https://github.com/Acebmoon/project-teamtalk/pull/100) | `88408db` | Contas TI; `20261119004000_admin_accounts.sql`; chave privada de serviço |
 | [#101](https://github.com/Acebmoon/project-teamtalk/pull/101) | `99ea1c2` | Texto/Realtime; `20261119001000_text_messages_realtime.sql`; composição da tela de chat |
-| [#102](https://github.com/Acebmoon/project-teamtalk/pull/102) | `fd1b8f7` | PDF privado; `20261119002000_secure_pdf_attachments.sql`; serviço e limite do hosting |
-| [#103](https://github.com/Acebmoon/project-teamtalk/pull/103) | `689255b` | Depende de #100; `20261119002000_initial_access_email.sql`; provedor/remetente verificados |
+| [#102](https://github.com/Acebmoon/project-teamtalk/pull/102) | `fd1b8f7` | PDF privado; `20261119003000_secure_pdf_attachments.sql`; serviço e limite do hosting |
+| [#103](https://github.com/Acebmoon/project-teamtalk/pull/103) | `689255b` | Depende de #100; `20261119006000_initial_access_email.sql`; provedor/remetente verificados |
 | [#104](https://github.com/Acebmoon/project-teamtalk/pull/104) | `31a7725` | Seletor PDF; callback de #102 e mesmo limite recebido por props |
 | [#105](https://github.com/Acebmoon/project-teamtalk/pull/105) | `319b475` | Leituras; `20261119002000_message_reads_realtime.sql`; observação dos balões na tela |
-| [#106](https://github.com/Acebmoon/project-teamtalk/pull/106) | `44553e1` | Grupos/auditoria; `20261119001000_release_groups_audit.sql`; chave de serviço |
+| [#106](https://github.com/Acebmoon/project-teamtalk/pull/106) | `44553e1` | Grupos/auditoria; `20261119005000_release_groups_audit.sql`; chave de serviço |
 
-**Migrations com versões repetidas entre PRs:** `20261119000000`, `20261119001000` e `20261119002000`. Antes do deploy conjunto, consolidar a ordem e atribuir versões únicas às migrations **ainda não aplicadas**; #100 precede #103. Não renumerar migrations aplicadas nem usar `migration repair` para esconder divergências. Reconciliar qualquer histórico existente com a equipe. O teste de contrato desta entrega reprova versões duplicadas no checkout.
+**Integração consolidada:** versões únicas e ordem final estão em [integração do MVP](integracao-mvp.md). As quatro migrations da main foram preservadas; as novas de PDF, contas, grupos e e-mail receberam versões 20261119003000, 20261119004000, 20261119005000 e 20261119006000. #100 precede #103. Não renumerar migrations aplicadas nem usar `migration repair` para esconder divergências. Reconciliar qualquer histórico existente com a equipe. O teste de contrato desta entrega reprova versões duplicadas no checkout.
 
 O #105 registra também duas asserções fechadas de publicação no #101 que precisam aceitar `message_reads`. Resolver na integração e executar a suíte combinada. Manter [contratos de autenticação](contratos-auth.md) e os contratos das frentes integradas.
 
@@ -114,7 +114,7 @@ Segredos opcionais não são retornados pelo parser nem colocados em `NextConfig
 
 ### Limite de PDFs
 
-O #102 tem padrão de **10 MiB**, mas Functions Vercel limitam payload a **4,5 MB**. Para ativar #102 na Vercel, definir `PDF_MAX_BYTES=4000000`, alinhando aplicação, seletor e Storage. O parser rejeita valor explícito maior nesse hosting; sem a variável, preserva o padrão de 10 MiB para compatibilidade local, portanto **não habilitar #102 na Vercel sem defini-la**. Testar multipart perto do limite e resposta 413 do proxy. O limite também afeta respostas de download e anexos maiores já existentes.
+O #102 tem padrão de **10 MiB**, mas Functions Vercel limitam payload a **4,5 MB**. Para ativar #102 na Vercel, definir `PDF_MAX_BYTES=4000000`, alinhando aplicação, seletor e Storage. O parser rejeita valor explícito maior nesse hosting; na Vercel, o padrão efetivo também é 4.000.000 bytes. Fora desse hosting, o padrão local permanece 10 MiB. Testar multipart perto do limite e resposta 413 do proxy. O limite também afeta respostas de download e anexos maiores já existentes.
 
 Se forem exigidos 10 MiB no hosting, registrar bloqueio e aprovar arquitetura que mantenha validação real no servidor e bucket privado antes da publicação. Não abrir bucket nem liberar upload direto não validado como contorno.
 

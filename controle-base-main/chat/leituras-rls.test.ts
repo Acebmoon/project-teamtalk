@@ -1,3 +1,4 @@
+import { completarInfraSupabase } from "../testes/infra-supabase";
 import { readFile, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { PGlite } from "@electric-sql/pglite";
@@ -30,6 +31,7 @@ async function preparar(publicacaoExistente: boolean) {
     grant usage on schema public, auth to anon, authenticated;
     alter default privileges in schema public grant all on tables to anon, authenticated;
   `);
+  await completarInfraSupabase(db);
   if (publicacaoExistente) await db.exec(`
     create table public.realtime_sentinel (id integer primary key);
     create publication supabase_realtime for table public.realtime_sentinel;
@@ -61,7 +63,7 @@ beforeEach(async () => {
   await banco.query(`insert into public.messages (id, conversation_id, sender_id, body, created_at)
     values ($1, $2, $3, 'Olá', '2026-11-19T00:00:00.123456Z')`, [mensagem, conversa, autor]);
   await banco.query(`insert into public.messages (id, conversation_id, sender_id, message_type, attachment_path, attachment_name, created_at)
-    values ($1, $2, $3, 'pdf', 'privado/documento.pdf', 'documento.pdf', '2026-11-19')`, [pdf, conversa, autor]);
+    values ($1, $2, $3, 'pdf', '00000000-0000-0000-0000-000000000080/00000000-0000-0000-0000-000000000001/00000000-0000-0000-0000-000000000083.pdf', 'documento.pdf', '2026-11-19')`, [pdf, conversa, autor]);
 });
 afterAll(async () => { await banco?.close(); });
 

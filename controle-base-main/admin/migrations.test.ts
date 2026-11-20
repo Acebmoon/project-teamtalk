@@ -1,3 +1,4 @@
+import { completarInfraSupabase } from "../testes/infra-supabase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { readdir, readFile } from "node:fs/promises";
@@ -32,6 +33,7 @@ beforeAll(async () => {
     grant usage on schema auth to anon, authenticated, service_role;
     grant execute on function auth.uid() to authenticated, service_role;
   `);
+  await completarInfraSupabase(banco);
   const diretorio = new URL("../../base(tempval)/supabase/migrations/", import.meta.url);
   for (const arquivo of (await readdir(diretorio)).filter((nome) => nome.endsWith(".sql")).sort())
     await banco.exec(await readFile(new URL(arquivo, diretorio), "utf8"));

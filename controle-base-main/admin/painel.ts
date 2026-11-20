@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { notFound } from "next/navigation";
+import { forbidden, notFound } from "next/navigation";
 import { exigirAdminTI } from "../auth/exigir-admin-ti";
 import { carregarNomeAdmin } from "./nome";
 import { criarServicoContas } from "./servico";
@@ -26,7 +26,7 @@ export async function carregarContaAdmin(parametros: Promise<{ id: string }>) {
 export function mensagemErroPagina(erro: unknown): string {
   const seguro = erroSeguro(erro);
   if (seguro.status === 401) redirect("/login");
-  if (seguro.status === 403) redirect("/");
+  if (seguro.status === 403) forbidden();
   if (seguro.status === 404) notFound();
   return seguro.message;
 }

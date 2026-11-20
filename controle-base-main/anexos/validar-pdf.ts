@@ -6,9 +6,9 @@ export const LIMITE_PDF_PADRAO = 10 * 1024 * 1024;
 export const MARGEM_MULTIPART = 64 * 1024;
 
 export function obterLimitePdf(valor = process.env.PDF_MAX_BYTES): number {
-  if (valor === undefined || valor === "") return LIMITE_PDF_PADRAO;
+  if (valor === undefined || valor === "") return process.env.VERCEL === "1" ? 4000000 : LIMITE_PDF_PADRAO;
   const limite = Number(valor);
-  if (!/^\d+$/.test(valor) || !Number.isSafeInteger(limite + MARGEM_MULTIPART) || limite <= 0) {
+  if (!/^\d+$/.test(valor) || !Number.isSafeInteger(limite + MARGEM_MULTIPART) || limite <= 0 || (process.env.VERCEL === "1" && limite > 4000000)) {
     throw new ErroPdf(500, "CONFIGURACAO_INVALIDA", "Limite de PDF não configurado corretamente.");
   }
   return limite;

@@ -1,3 +1,4 @@
+import { completarInfraSupabase } from "../testes/infra-supabase";
 import { readFile, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { PGlite } from "@electric-sql/pglite";
@@ -30,6 +31,7 @@ async function preparar(publicacaoExistente: boolean) {
     -- Reproduz os grants padrão do Supabase; a migration restringe INSERT.
     alter default privileges in schema public grant all on tables to anon, authenticated;
   `);
+  await completarInfraSupabase(db);
   if (publicacaoExistente) await db.exec(`
     create table public.realtime_sentinel (id integer primary key);
     create publication supabase_realtime for table public.realtime_sentinel;
@@ -142,13 +144,13 @@ describe("migrations reais: mensagens, payload, RLS e publicação", () => {
   it("publica messages sem remover tabelas existentes da publicação", async () => {
     const { rows } = await banco.query(`select tablename from pg_publication_tables
       where pubname = 'supabase_realtime' and schemaname = 'public' order by tablename`);
-    expect(rows).toEqual([{ tablename: "messages" }, { tablename: "realtime_sentinel" }]);
+    expect(rows).toEqual([{ tablename: "message_reads" }, { tablename: "messages" }, { tablename: "realtime_sentinel" }]);
   });
   it("também cria a publicação quando ainda não existe", async () => {
     const local = await preparar(false);
     try {
-      const { rows } = await local.query("select tablename from pg_publication_tables where pubname = 'supabase_realtime'");
-      expect(rows).toEqual([{ tablename: "messages" }]);
+      const { rows } = await local.query<{ tablename: string }>("select tablename from pg_publication_tables where pubname = 'supabase_realtime'");
+      expect(rows.map((r) => r.tablename).sort()).toEqual(["message_reads", "messages"]);
     } finally { await local.close(); }
   }, 30000);
 });

@@ -1,3 +1,4 @@
+import { completarInfraSupabase } from "../../testes/infra-supabase";
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { PGlite } from "@electric-sql/pglite";
 import { readdir, readFile } from "node:fs/promises";
@@ -49,6 +50,7 @@ beforeAll(async () => {
     alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
     alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
   `);
+  await completarInfraSupabase(banco);
   const diretorio = new URL("../../../base(tempval)/supabase/migrations/", import.meta.url);
   for (const nome of (await readdir(diretorio)).filter((nome) => nome.endsWith(".sql")).sort())
     await banco.exec(await readFile(new URL(nome, diretorio), "utf8"));
@@ -66,6 +68,13 @@ beforeEach(async () => {
 afterAll(async () => { await banco?.close(); });
 
 describe("grupos e auditoria nas migrations reais em PostgreSQL", () => {
+  it.each(["pending", "failed", "sent"])("revalida credencial inicial %s na RPC de grupos", async (estado) => {
+    await banco.query(`insert into public.initial_access_deliveries
+      (target_user_id, actor_id, state, expires_at) values ($1, $1, $2, now() - interval '1 hour')`, [ator, estado]);
+    await expect(criar()).rejects.toMatchObject({ code: "42501" });
+    expect((await banco.query("select * from public.release_groups")).rows).toHaveLength(0);
+    expect(await eventos()).toHaveLength(0);
+  });
   it("cria grupo desabilitado e grava ator, ação, alvo, detalhes e horário", async () => {
     const id = await criar();
     const logs = await eventos();

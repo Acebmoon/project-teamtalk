@@ -27,6 +27,8 @@ begin
   if not found then
     raise exception 'Admin TI required' using errcode = '42501';
   end if;
+  -- A versão consolidada do guard SQL inclui a validade do e-mail inicial.
+  perform public.admin_assert_actor(p_actor_id);
   if p_action is null or p_action not in ('criar', 'habilitar', 'desabilitar', 'incluir', 'remover') then
     raise exception 'Invalid group operation' using errcode = '22023';
   end if;

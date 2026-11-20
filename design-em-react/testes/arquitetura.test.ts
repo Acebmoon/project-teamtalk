@@ -18,7 +18,9 @@ it("mantém toda a apresentação sem importar Supabase ou acessar credenciais/a
     const fonte = ts.createSourceFile(caminho, texto, ts.ScriptTarget.Latest, true);
     function conferir(no: ts.Node) {
       if ((ts.isImportDeclaration(no) || ts.isExportDeclaration(no)) && no.moduleSpecifier && ts.isStringLiteral(no.moduleSpecifier)) {
-        expect(no.moduleSpecifier.text, caminho).not.toMatch(/supabase|@controle\/(auth|admin)(\/|$)/i);
+        const somenteTipos = ts.isImportDeclaration(no) && no.importClause?.isTypeOnly;
+        expect(no.moduleSpecifier.text, caminho).not.toMatch(/supabase/i);
+        if (!somenteTipos) expect(no.moduleSpecifier.text, caminho).not.toMatch(/@controle\/(auth|admin)(\/|$)/i);
       }
       if (ts.isCallExpression(no) && no.arguments[0] && ts.isStringLiteral(no.arguments[0])) {
         expect(no.arguments[0].text, caminho).not.toMatch(/@supabase|@controle\/supabase/i);

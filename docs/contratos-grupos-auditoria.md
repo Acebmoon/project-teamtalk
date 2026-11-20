@@ -51,7 +51,7 @@ Eventos ordenam por `created_at DESC, id DESC`. A projeção `id::text` preserva
 
 ## Escrita atômica e eventos
 
-A migration aditiva `20261119001000_release_groups_audit.sql` cria `admin_manage_release_group(...)`, sem depender da migration de contas do PR #100. As quatro migrations anteriores ficam intactas e `is_active_authorized_user()` não é substituída. A RPC é invoker, com `search_path = ''`, EXECUTE revogado de PUBLIC/anon/authenticated e concedido somente a `service_role`. O servidor preenche `p_actor_id` pelo usuário autenticado. O banco revalida papel TI, estado ativo e senha já trocada, mantendo lock compartilhado sobre o ator durante a operação. O grupo recebe lock de atualização, serializando mudanças de estado e composição.
+A migration aditiva `20261119005000_release_groups_audit.sql` cria `admin_manage_release_group(...)`, sem depender da migration de contas do PR #100. As quatro migrations anteriores ficam intactas e `is_active_authorized_user()` não é substituída. A RPC é invoker, com `search_path = ''`, EXECUTE revogado de PUBLIC/anon/authenticated e concedido somente a `service_role`. O servidor preenche `p_actor_id` pelo usuário autenticado. O banco revalida papel TI, estado ativo e senha já trocada, mantendo lock compartilhado sobre o ator durante a operação. O grupo recebe lock de atualização, serializando mudanças de estado e composição.
 
 | Alteração efetiva | `action` | `target_user_id` | `details` |
 | --- | --- | --- | --- |

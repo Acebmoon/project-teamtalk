@@ -1,3 +1,4 @@
+import { completarInfraSupabase } from "../testes/infra-supabase";
 import { readFile, readdir } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { PGlite } from "@electric-sql/pglite";
@@ -43,6 +44,7 @@ beforeAll(async () => {
     create policy generic_storage_policy on storage.objects for all to anon, authenticated
     using (true) with check (true);
   `);
+  await completarInfraSupabase(banco);
   for (const nome of (await readdir(migrations)).filter((nome) => nome.endsWith(".sql")).sort()) {
     await banco.exec(await readFile(`${migrations}/${nome}`, "utf8"));
   }

@@ -1,5 +1,7 @@
 # Preferências pessoais da Inbox — Issue #98
 
+> Atualização de 20/11/2026: o [MVP integrado](../../docs/integracao-mvp.md) conecta a rota inicial à Inbox, aos endpoints de texto/PDF/leituras e à persistência de preferências. As observações de implementação isolada abaixo registram a entrega original; o guia consolidado descreve o estado atual.
+
 Prioridade, coluna e favorito pertencem ao usuário autenticado. Não atualizam mensagens, atividade, recibos, participantes nem a organização dos demais usuários. Evolução de UX relacionada a RNF08, RNF12 e SEG04.
 
 ## Banco e autorização

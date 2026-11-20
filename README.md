@@ -1,5 +1,9 @@
 # project-teamtalk
 
+## MVP integrado
+
+A rota autenticada `/` abre a Inbox conectada a conversas, mensagens, recibos e PDF. O painel TI inclui contas, liberação gradual e auditoria. Veja o [guia de integração](docs/integracao-mvp.md) para as entregas, a ordem das migrations e a validação; QA e homologação real seguem nas Issues #85–#88.
+
 ## Visão geral
 
 Aplicativo Web de Comunicação Interna corporativa, com experiência mobile-first inspirada em aplicativos de mensagens e identidade visual da empresa. O acesso do MVP é exclusivo pelo navegador do celular, por link direto, com suporte planejado a Chrome no Android e Safari no iOS. O acesso por computadores e notebooks deve ser bloqueado tecnicamente.

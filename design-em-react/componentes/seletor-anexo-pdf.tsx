@@ -1,5 +1,6 @@
 "use client";
 
+import { Icone } from "@design/icones/icone";
 import { useId, useRef, useState } from "react";
 import type { ChangeEvent } from "react";
 import { formatarTamanhoArquivo, validarAnexoPdf } from "@controle/anexos/validar-anexo-pdf";
@@ -67,7 +68,7 @@ export function SeletorAnexoPdf({
       </div>
       <div className={estilos.acoes}>
         <label className={estilos.controle} data-desabilitado={desabilitado}>
-          {arquivo ? "Substituir PDF" : "Anexar PDF"}
+          <Icone nome="anexar-pdf" />{arquivo ? "Substituir PDF" : "Anexar PDF"}
           <input
             ref={entrada}
             className={estilos.entrada}

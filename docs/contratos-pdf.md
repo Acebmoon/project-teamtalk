@@ -4,11 +4,11 @@
 
 Toda rota usa `criarServidor()` e `avaliarSessao(supabase)` e autoriza a conversa com `can_access_conversation()`. Sessão ausente/vencida recebe **401**; conta negada, senha provisória pendente e não participante recebem **403**. Admin TI também precisa participar. O middleware mantém a restrição de dispositivo definida em `contratos-auth.md`; os handlers verificam autorização independentemente dele.
 
-Aplicar a migration aditiva `20261119002000_secure_pdf_attachments.sql` e configurar no servidor:
+Aplicar a migration aditiva `20261119003000_secure_pdf_attachments.sql` e configurar no servidor:
 
 | Variável | Valor / finalidade |
 |---|---|
-| `PDF_MAX_BYTES` | Inteiro positivo em bytes. Padrão `10485760` (10 MiB). Configuração inválida falha com 500. |
+| `PDF_MAX_BYTES` | Inteiro positivo em bytes. Padrão local `10485760` (10 MiB); na Vercel `4000000` (inclusive sem variável explícita). Configuração inválida falha com 500. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Chave exclusiva do servidor, sem prefixo `NEXT_PUBLIC_`, usada apenas nos bytes de Storage após autorização. |
 | `NEXT_PUBLIC_SUPABASE_URL` | URL do projeto Supabase existente. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Chave pública existente do cliente de sessão; as mensagens continuam sujeitas à RLS. |

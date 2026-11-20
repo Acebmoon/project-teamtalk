@@ -2,6 +2,8 @@
 
 Esta pasta reúne a especificação do TeamTalk, aplicativo web de comunicação interna corporativa. O catálogo abaixo segue a divisão do modelo acadêmico indicado, com conteúdo próprio do projeto.
 
+**MVP integrado (20/11/2026):** [fluxos reais, PRs preservados, migrations e validação](integracao-mvp.md).
+
 ## Comece por aqui
 
 | Ordem | Arquivo | Para que serve |
@@ -49,3 +51,12 @@ Fontes primárias preservadas: [Documento de Requisitos](Documento-de-Requisitos
 - Requisitos de origem: versão 1.0, entrevista com o cliente.
 - Prazo do MVP: **20/11/2026**.
 - Estado documentado: base da `main` consultada em **13/11/2026**, com PR #90 integrado e as quatro migrations existentes.
+
+## Contratos de implementação
+
+- [Autenticação](contratos-auth.md)
+- [Contas TI](contratos-admin.md)
+- [Grupos e auditoria](contratos-grupos-auditoria.md)
+- [E-mail inicial](contratos-email-inicial.md)
+- [Anexos PDF](contratos-pdf.md)
+- [Homologação Vercel/Supabase](homologacao-vercel-supabase.md)

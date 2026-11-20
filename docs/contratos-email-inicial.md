@@ -27,7 +27,7 @@ O adaptador chama somente `POST https://api.resend.com/emails`, com um destinat�
 
 ## Ordem de emissão e política de uso
 
-Aplicar `20261119002000_initial_access_email.sql` após `20261119000000_admin_accounts.sql` do PR #100. As migrations anteriores permanecem intactas. Nenhuma alteração de banco remoto é executada por esta entrega.
+Aplicar `20261119006000_initial_access_email.sql` após `20261119004000_admin_accounts.sql` do PR #100. As migrations anteriores permanecem intactas. Nenhuma alteração de banco remoto é executada por esta entrega.
 
 1. No cadastro, Auth cria a conta como `pending`; no reset, a reserva administrativa coloca a conta em `blocked` antes de alterar a senha.
 2. Depois da operação de senha, `admin_prepare_initial_email` grava metadados da entrega como `pending`, define o prazo usando o relógio do banco e reaplica **`public.users.must_change_password = true`**. A conta já fica sem autorização enquanto a entrega estiver pendente. No cadastro, `admin_create_account` confirma o perfil/estado e sua auditoria.

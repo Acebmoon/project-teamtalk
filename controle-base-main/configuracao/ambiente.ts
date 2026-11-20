@@ -64,7 +64,7 @@ export function validarAmbienteServidor(env: Variaveis) {
   }
 
   const sessaoMaxHoras = numero(env, "SESSAO_MAX_HORAS", 12);
-  const pdfMaxBytes = numero(env, "PDF_MAX_BYTES", 10485760, true);
+  const pdfMaxBytes = numero(env, "PDF_MAX_BYTES", env.VERCEL === "1" ? 4000000 : 10485760, true);
   // Margem para multipart abaixo do limite de payload das Functions (4,5 MB).
   if (env.VERCEL === "1" && env.PDF_MAX_BYTES !== undefined && pdfMaxBytes > 4000000) {
     falhar("PDF_MAX_BYTES (na Vercel, máximo 4000000)");

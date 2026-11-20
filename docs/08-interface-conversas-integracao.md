@@ -1,5 +1,7 @@
 # Interface de conversas — integração
 
+> Atualização de 20/11/2026: o [MVP integrado](integracao-mvp.md) conecta a rota inicial à Inbox, aos endpoints de texto/PDF/leituras e à persistência de preferências. As observações de implementação isolada abaixo registram a entrega original; o guia consolidado descreve o estado atual.
+
 ## O que esta entrega fornece
 - Componente React mobile-first `TelaConversas`.
 - Lista de conversas, seleção, cabeçalho, histórico, balões recebidos/enviados e compositor de texto.

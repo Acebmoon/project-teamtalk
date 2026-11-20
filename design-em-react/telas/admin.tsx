@@ -19,6 +19,7 @@ export function TelaAdmin({ nome, filtros, lista, criarConta }: {
     <section className="painel admin-painel" aria-labelledby="titulo-admin">
       <a href="/">Voltar ao início</a>
       <h1 id="titulo-admin">Painel da TI</h1>
+      <nav aria-label="Administração"><a href="/admin/grupos">Grupos de liberação</a> · <a href="/admin/auditoria">Auditoria</a></nav>
       <p>Olá, <strong>{nome}</strong>. Gerencie as contas da equipe.</p>
       <details className="admin-cadastro">
         <summary>Cadastrar uma conta</summary>
