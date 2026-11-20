@@ -6,9 +6,9 @@ const rota = (caminho: string, decisao: DecisaoAcesso = "seguir", admin = false,
   decidirRota(caminho, metodo, decisao, admin);
 
 describe("decidirRota", () => {
-  it("envia funcionário em /admin e subrotas para o início", () => {
-    expect(rota("/admin")).toMatchObject({ tipo: "redirecionar", caminho: "/" });
-    expect(rota("/admin/usuarios")).toMatchObject({ tipo: "redirecionar", caminho: "/" });
+  it("nega páginas administrativas a funcionário com 403", () => {
+    expect(rota("/admin")).toMatchObject({ tipo: "erro-pagina", codigo: 403 });
+    expect(rota("/admin/grupos")).toMatchObject({ tipo: "erro-pagina", codigo: 403 });
   });
   it("nega API administrativa a funcionário, inclusive por POST", () => {
     expect(rota("/api/admin/estado")).toMatchObject({ tipo: "erro-api", codigo: 403 });
@@ -53,7 +53,8 @@ describe("decidirRota", () => {
     expect(rota("/primeiro-acesso")).toMatchObject({ tipo: "redirecionar", caminho: "/" });
   });
   it("usa 303 após POST e 307 após GET ou HEAD", () => {
-    expect(rota("/admin", "seguir", false, "POST")).toMatchObject({ tipo: "redirecionar", codigo: 303 });
-    expect(rota("/admin", "seguir", false, "HEAD")).toMatchObject({ tipo: "redirecionar", codigo: 307 });
+    expect(rota("/", "login", false, "POST")).toMatchObject({ tipo: "redirecionar", codigo: 303 });
+    expect(rota("/", "login", false, "HEAD")).toMatchObject({ tipo: "redirecionar", codigo: 307 });
   });
 });
+
