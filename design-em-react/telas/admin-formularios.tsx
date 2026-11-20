@@ -30,7 +30,7 @@ export function FormularioCadastro({ criarConta }: { criarConta: AcaoFormulario 
     <label htmlFor="cadastro-senha">Senha provisória</label>
     <input id="cadastro-senha" name="senha" type="password" autoComplete="new-password"
       minLength={10} maxLength={72} required aria-describedby="cadastro-regra" />
-    <p id="cadastro-regra">Ao menos 10 caracteres, até 72 bytes. A troca será obrigatória no primeiro acesso.</p>
+    <p id="cadastro-regra">Ao menos 10 caracteres, até 72 bytes. A senha será enviada ao e-mail corporativo com prazo para troca obrigatória.</p>
     <p>Contas ativas de funcionários também precisam pertencer a um grupo de liberação habilitado.</p>
     <Resultado estado={estado} />
     <button type="submit" disabled={enviando}>{enviando ? "Cadastrando…" : "Cadastrar conta"}</button>
@@ -47,7 +47,7 @@ export function FormularioOperacao({ id, operacao, rotulo, gerirConta }: {
       <label htmlFor="senha-redefinicao">Nova senha provisória</label>
       <input id="senha-redefinicao" name="senha" type="password" autoComplete="new-password"
         minLength={10} maxLength={72} required aria-describedby="regra-redefinicao" />
-      <p id="regra-redefinicao">Ao menos 10 caracteres, até 72 bytes. A pessoa deverá trocá-la no próximo acesso.</p>
+      <p id="regra-redefinicao">Ao menos 10 caracteres, até 72 bytes. A nova senha será enviada por e-mail com prazo para troca obrigatória.</p>
     </> : <label className="admin-confirmacao">
       <input type="checkbox" required /> Confirmo que desejo {rotulo.toLowerCase()}.
     </label>}

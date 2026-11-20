@@ -15,7 +15,7 @@ export async function criarConta(_estado: EstadoFormulario, formulario: FormData
       papel: formulario.get("papel"), status: formulario.get("status"), senha: formulario.get("senha"),
     });
     revalidatePath("/admin");
-    return { sucesso: "Conta cadastrada. A senha provisória deverá ser trocada no primeiro acesso." };
+    return { sucesso: "Conta cadastrada e e-mail de primeiro acesso enviado. A senha provisória deverá ser trocada no prazo informado." };
   } catch (erro) { return { erro: erroSeguro(erro).message }; }
 }
 
@@ -31,7 +31,7 @@ export async function gerirConta(_estado: EstadoFormulario, formulario: FormData
     revalidatePath("/admin");
     revalidatePath(`/admin/contas/${id}`);
     return { sucesso: acao === "redefinir-senha"
-      ? "Senha redefinida. A conta exigirá uma nova senha no próximo acesso."
+      ? "Senha redefinida e e-mail de primeiro acesso enviado. A troca é obrigatória no prazo informado."
       : "Estado da conta atualizado." };
   } catch (erro) { return { erro: erroSeguro(erro).message }; }
 }

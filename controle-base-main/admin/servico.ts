@@ -6,6 +6,7 @@ import { CAMPOS_CONTA } from "./contratos";
 import { criarClienteAdmin } from "./cliente";
 import { ErroAdmin } from "./erros";
 import { validarAlteracao, validarCadastro, validarFiltros, validarId } from "./validacoes";
+import { criarEmailCorporativo } from "../email/adaptador";
 
 const BANIMENTO = "876000h";
 
@@ -29,6 +30,31 @@ export function criarServicoContas(acesso: AcessoAdminTI) {
       actor_id: ator, action: acao, target_user_id: alvo, details: detalhes,
     });
     falhaBanco(error);
+  }
+
+  async function prepararEmail(id: string, operacao: string | null, validadeHoras: number) {
+    const { data, error } = await admin.rpc("admin_prepare_initial_email", {
+      p_actor_id: ator, p_target_id: id, p_operation_id: operacao, p_validity_hours: validadeHoras,
+    });
+    falhaBanco(error);
+    if (!data?.id || !data?.expires_at) throw new ErroAdmin(503, "banco", "Preparo do primeiro acesso não confirmado.");
+    return data as { id: string; expires_at: string };
+  }
+
+  async function entregarEmail(email: ReturnType<typeof criarEmailCorporativo>, conta: Conta,
+    senha: string, entrega: { id: string; expires_at: string }) {
+    let sucesso = false;
+    try {
+      await email.enviar({ nome: conta.display_name, email: conta.email, senha,
+        expiraEm: entrega.expires_at, entregaId: entrega.id });
+      sucesso = true;
+    } catch { /* Erros externos nunca entram em logs, auditoria, resposta ou cause. */ }
+    const { error } = await admin.rpc("admin_finish_initial_email", {
+      p_actor_id: ator, p_delivery_id: entrega.id, p_success: sucesso,
+    });
+    // Se o resultado auditado for incerto, manter a reserva/entrega pendente.
+    falhaBanco(error);
+    if (!sucesso) throw new ErroAdmin(502, "email-provedor", "O envio não foi confirmado. A conta permanece sem acesso; solicite uma nova credencial à TI.");
   }
 
   return {
@@ -59,6 +85,7 @@ export function criarServicoContas(acesso: AcessoAdminTI) {
 
     async cadastrar(entrada: unknown): Promise<Conta> {
       const dados = validarCadastro(entrada);
+      const email = criarEmailCorporativo();
       await auditar("account.creation_requested", null, { role: dados.papel, status: dados.status });
       const { data, error } = await admin.auth.admin.createUser({
         email: dados.email,
@@ -74,13 +101,16 @@ export function criarServicoContas(acesso: AcessoAdminTI) {
         throw new ErroAdmin(502, "auth", "O serviço de autenticação não confirmou o cadastro.");
       }
       const id = data.user.id;
+      let conta: Conta;
+      let entrega: { id: string; expires_at: string };
       try {
-        const { data: conta, error: erroPerfil } = await admin.rpc("admin_create_account", {
+        entrega = await prepararEmail(id, null, email.validadeHoras);
+        const { data: perfil, error: erroPerfil } = await admin.rpc("admin_create_account", {
           p_actor_id: ator, p_target_id: id, p_role: dados.papel, p_status: dados.status,
         });
         falhaBanco(erroPerfil);
-        if (!conta) throw new ErroAdmin(503, "banco", "Cadastro não confirmado.");
-        return conta as Conta;
+        if (!perfil) throw new ErroAdmin(503, "banco", "Cadastro não confirmado.");
+        conta = perfil as Conta;
       } catch {
         // Não apagar o usuário: uma resposta perdida pode esconder um commit já auditado.
         // O perfil nasce pending; o banimento também restringe o Auth em caso de falha parcial.
@@ -88,12 +118,15 @@ export function criarServicoContas(acesso: AcessoAdminTI) {
         await auditar("account.creation_incomplete", id, { verificar_auth: true }).catch(() => undefined);
         throw new ErroAdmin(503, "cadastro-incompleto", "Cadastro não confirmado. Consulte a conta e o Auth antes de reativá-la.");
       }
+      await entregarEmail(email, conta, dados.senha, entrega);
+      return conta;
     },
 
     async alterar(entradaId: unknown, entrada: unknown): Promise<Conta> {
       const id = validarId(entradaId);
       const dados = validarAlteracao(entrada);
       if (id === ator) throw new ErroAdmin(400, "propria-conta", "Use outra conta Admin TI para administrar sua conta.");
+      const email = dados.acao === "redefinir-senha" ? criarEmailCorporativo() : null;
       const { data, error } = await admin.rpc("admin_start_account_operation", {
         p_actor_id: ator, p_target_id: id, p_action: dados.acao,
       });
@@ -117,6 +150,19 @@ export function criarServicoContas(acesso: AcessoAdminTI) {
           falhaBanco(erroFalha);
         }
         throw new ErroAdmin(502, "auth", "O Auth não confirmou a alteração. A conta permanece sem acesso; consulte a auditoria.");
+      }
+      if (email && dados.senha) {
+        const entrega = await prepararEmail(id, operacao.operacao_id, email.validadeHoras);
+        try { await entregarEmail(email, operacao.conta, dados.senha, entrega); }
+        catch (erro) {
+          if (erro instanceof ErroAdmin && erro.codigo === "email-provedor") {
+            const { error: erroFalha } = await admin.rpc("admin_finish_account_operation", {
+              p_actor_id: ator, p_operation_id: operacao.operacao_id, p_success: false,
+            });
+            falhaBanco(erroFalha);
+          }
+          throw erro;
+        }
       }
       // A finalização repõe must_change_password=true APÓS updateUserById({ password }).
       const { data: conta, error: erroFinal } = await admin.rpc("admin_finish_account_operation", {
