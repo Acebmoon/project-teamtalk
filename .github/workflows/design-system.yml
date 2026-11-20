@@ -1,0 +1,46 @@
+name: Design system mobile
+
+on:
+  push:
+    branches: [feat/issue-74-design-system-mobile]
+  pull_request:
+    branches: [main]
+    paths:
+      - design-em-react/**
+      - base(tempval)/**
+      - package.json
+      - vitest.config.ts
+      - .github/workflows/design-system.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: design-system-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  qualidade-mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm install --no-audit --no-fund
+      - run: npm run typecheck --workspace 'base(tempval)'
+      - run: npm run lint --workspace 'base(tempval)'
+      - run: npm test --workspace 'base(tempval)' -- --maxWorkers=2
+      - run: npm run build --workspace 'base(tempval)'
+      - run: npx playwright install --with-deps chromium webkit
+      - run: npm run test:mobile --workspace 'base(tempval)'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: design-system-mobile
+          path: test-results/
+          if-no-files-found: ignore

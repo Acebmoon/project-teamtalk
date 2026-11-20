@@ -9,6 +9,7 @@
     "lint": "cd .. && eslint --config \"base(tempval)/eslint.config.mjs\" \"base(tempval)\" controle-base-main design-em-react",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --root ..",
+    "test:mobile": "playwright test --config ../design-em-react/testes/playwright.config.ts",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "db:reset": "supabase db reset"
@@ -27,6 +28,9 @@
     "@types/react-dom": "^19.0.4",
     "eslint": "^9.22.0",
     "eslint-config-next": "^15.2.4",
+    "jsdom": "^26.1.0",
+    "playwright": "^1.56.0",
+    "vite": "^6.4.3",
     "supabase": "^2.15.8",
     "typescript": "^5.8.2",
     "vitest": "^3.2.4"
