@@ -15,6 +15,8 @@ Esta pasta reúne a especificação do TeamTalk, aplicativo web de comunicação
 | 7 | [07 — Fluxos e estados](07-fluxos-e-estados.md) | Fluxos de acesso, primeiro uso, sessão, mensagens e sequências. |
 | 8 | [08 — Testes e rastreabilidade](08-testes-e-rastreabilidade.md) | Requisitos, Issues reais, testes existentes e lacunas. |
 
+- [Contrato de anexos PDF](contratos-pdf.md): upload e download autenticados.
+
 ## Diagramas UML
 
 Consulte a pasta [diagramas](diagramas/README.md), que reúne os diagramas de caso de uso, máquina de estados, temporização e atividades, com explicações e rastreabilidade dos requisitos.
