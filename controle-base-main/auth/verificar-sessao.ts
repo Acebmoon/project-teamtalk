@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { decidirAcesso } from "./decidir-acesso";
+import { obterAmbienteServidor } from "../configuracao/servidor";
 
 type EstadoAcesso = {
   authorized?: boolean;
@@ -21,7 +22,7 @@ export async function avaliarSessao(supabase: SupabaseClient) {
     precisaTrocarSenha: !error && estado?.must_change_password === true,
     amr: verificacao?.claims?.amr,
     agora: Date.now() / 1000,
-    limiteHoras: Number(process.env.SESSAO_MAX_HORAS) || 12,
+    limiteHoras: obterAmbienteServidor().sessaoMaxHoras,
   });
 
   return { decisao, usuario: user, ehAdmin: !error && estado?.it_admin === true };
