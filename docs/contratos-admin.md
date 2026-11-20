@@ -20,7 +20,7 @@ Leituras de contas usam o cliente de sessão, respeitando RLS. O cliente privile
 4. Manter `auth.enable_signup = false`, já presente em `supabase/config.toml`; no Supabase hospedado, manter também o cadastro público desabilitado nas configurações de Auth. O aplicativo não contém fluxo de autorregistro.
 5. Acessar por Chrome Android ou Safari iPhone com um Admin TI ativo e senha definitiva. A regra mobile também vale para TI.
 
-As migrations anteriores permanecem intactas. Esta entrega não executa alterações em um Supabase remoto. Envio de e-mail e gestão de grupos continuam nas frentes correspondentes: ativar um funcionário não o inclui automaticamente em um grupo habilitado.
+As migrations anteriores permanecem intactas. Esta entrega não executa alterações em um Supabase remoto. O envio individual após cadastro/redefinição e sua migration/configuração estão em [contratos-email-inicial.md](contratos-email-inicial.md). Ativar um funcionário não o inclui automaticamente em um grupo habilitado.
 
 ## API
 
@@ -50,7 +50,8 @@ Para alterações existentes:
 
 1. `admin_start_account_operation` revalida o ator, reserva o alvo, salva o estado anterior e coloca a conta em `blocked`, junto de `account.operation_started`.
 2. O servidor chama `auth.admin.updateUserById()`. Bloqueio/desativação aplicam `ban_duration: "876000h"`; reativação remove o banimento com `"none"`. Redefinição envia a senha somente no corpo da chamada servidor→Auth e mantém/remove banimento de acordo com o estado anterior.
-3. `admin_finish_account_operation` aplica o estado final e grava `account.blocked`, `account.reactivated`, `account.disabled` ou `account.password_reset`, atomicamente. Na redefinição, preserva o estado anterior e repõe **`must_change_password = true` depois do Auth**, pois o trigger `on_auth_password_changed` zera a marca ao alterar o hash. Enquanto isso ocorre, o estado bloqueado impede acesso inclusive com JWT existente.
+3. Na redefinição, preparar e enviar o e-mail de primeiro acesso conforme o [contrato de envio](contratos-email-inicial.md), reaplicando a marca de troca obrigatória após o Auth e mantendo a reserva até confirmar o envio auditado.
+4. `admin_finish_account_operation` aplica o estado final e grava `account.blocked`, `account.reactivated`, `account.disabled` ou `account.password_reset`, atomicamente. Na redefinição, preserva o estado anterior e repõe **`must_change_password = true` depois do Auth**, pois o trigger `on_auth_password_changed` zera a marca ao alterar o hash. Enquanto isso ocorre, o estado bloqueado impede acesso inclusive com JWT existente. Falha de envio mantém acesso negado; entrega pendente impede liberação da reserva até reconciliação.
 
 O banimento no Auth restringe novos logins; o estado de `public.users` e as funções de autorização/RLS revogam o acesso aos dados nas consultas seguintes. Não se depende apenas do banimento para controlar sessões já emitidas.
 
@@ -62,7 +63,7 @@ Todos os eventos gravam `actor_id`, `action`, `target_user_id` e `details`. Cons
 
 Auth e PostgreSQL não oferecem uma transação conjunta. Uma rejeição definitiva do Auth (4xx, exceto 429) gera `account.operation_failed`, mantém a conta sem acesso e libera a reserva para nova operação. Falhas incertas de rede, 429/5xx ou erro na finalização mantêm a conta bloqueada e a reserva. A API não tenta restaurar acesso automaticamente nem repetir redefinições de senha.
 
-Em uma falha incerta, um operador TI deve consultar, em conexão administrativa confiável, `public.admin_account_operations`, os eventos por `details.operation_id` e o estado correspondente no Auth. Somente após confirmar que não há chamada pendente, concluir ou desfazer a sincronização com Auth. Para uma operação Auth confirmada, chamar `admin_finish_account_operation(actor_id, operation_id, true)` com o mesmo ator ainda autorizado. Para uma rejeição definitiva confirmada, usar `false`; a conta continua sem acesso até a TI reativá-la. Não remover reservas automaticamente por tempo e não executar essas RPCs pelo navegador.
+Em uma falha incerta, um operador TI deve consultar, em conexão administrativa confiável, `public.admin_account_operations`, os eventos por `details.operation_id` e o estado correspondente no Auth. Somente após confirmar que não há chamada pendente, concluir ou desfazer a sincronização com Auth. Em redefinição com entrega de e-mail, seguir primeiro a [reconciliação da entrega](contratos-email-inicial.md); uma entrega pendente impede liberação da reserva. Para uma operação Auth e envio confirmados, chamar `admin_finish_account_operation(actor_id, operation_id, true)` com o mesmo ator ainda autorizado. Para uma rejeição definitiva confirmada, usar `false`; a conta continua sem acesso até nova emissão e reativação pela TI. Não remover reservas automaticamente por tempo e não executar essas RPCs pelo navegador.
 
 ## Verificação
 

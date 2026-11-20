@@ -1,15 +1,17 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { criarServicoContas } from "./servico";
 
 const m = vi.hoisted(() => ({ createUser: vi.fn(), updateUserById: vi.fn(), rpc: vi.fn(),
   insert: vi.fn(), fromAdmin: vi.fn(), fromSessao: vi.fn(), select: vi.fn(), eq: vi.fn(),
-  or: vi.fn(), order: vi.fn(), range: vi.fn(), maybeSingle: vi.fn(), fabrica: vi.fn() }));
+  or: vi.fn(), order: vi.fn(), range: vi.fn(), maybeSingle: vi.fn(), fabrica: vi.fn(), email: vi.fn(), enviar: vi.fn() }));
 vi.mock("server-only", () => ({}));
 vi.mock("./cliente", () => ({ criarClienteAdmin: m.fabrica }));
+vi.mock("../email/adaptador", () => ({ criarEmailCorporativo: m.email }));
 const ator = "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa";
 const alvo = "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb";
 const op = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+const entrega = { id: "dddddddd-dddd-4ddd-8ddd-dddddddddddd", expires_at: "2026-11-20T12:00:00.000Z" };
 const conta = { id: alvo, email: "ana@empresa.com", display_name: "Ana", role: "employee", status: "active", must_change_password: true };
 const cadastro = { nome: "Ana", email: "ana@empresa.com", senha: "Temporaria123!" };
 const consulta = { select: m.select, eq: m.eq, or: m.or, order: m.order, range: m.range, maybeSingle: m.maybeSingle };
@@ -29,9 +31,12 @@ beforeEach(() => {
   m.maybeSingle.mockResolvedValue({ data: conta, error: null });
   m.createUser.mockResolvedValue({ data: { user: { id: alvo } }, error: null });
   m.updateUserById.mockResolvedValue({ data: { user: { id: alvo } }, error: null });
-  m.rpc.mockImplementation(async (nome: string) => nome === "admin_start_account_operation"
-    ? { data: { operacao_id: op, conta }, error: null } : { data: conta, error: null });
+  m.rpc.mockImplementation(async (nome: string) => ({ data: nome === "admin_start_account_operation"
+    ? { operacao_id: op, conta } : nome === "admin_prepare_initial_email" ? entrega : conta, error: null }));
+  m.email.mockReturnValue({ validadeHoras: 24, enviar: m.enviar });
+  m.enviar.mockResolvedValue(undefined);
 });
+afterEach(() => vi.restoreAllMocks());
 
 describe("serviço de contas", () => {
   it("lista por sessão/RLS com paginação limitada e ordenação estável", async () => {
@@ -63,6 +68,15 @@ describe("serviço de contas", () => {
       p_actor_id: ator, p_target_id: alvo, p_role: "employee", p_status: "pending",
     });
     expect(m.createUser.mock.invocationCallOrder[0]).toBeLessThan(m.rpc.mock.invocationCallOrder[0]);
+    expect(m.rpc).toHaveBeenCalledWith("admin_prepare_initial_email", {
+      p_actor_id: ator, p_target_id: alvo, p_operation_id: null, p_validity_hours: 24,
+    });
+    expect(m.enviar).toHaveBeenCalledWith({ nome: conta.display_name, email: conta.email,
+      senha: cadastro.senha, expiraEm: entrega.expires_at, entregaId: entrega.id });
+    expect(m.rpc.mock.invocationCallOrder[1]).toBeLessThan(m.enviar.mock.invocationCallOrder[0]);
+    expect(m.rpc).toHaveBeenLastCalledWith("admin_finish_initial_email", {
+      p_actor_id: ator, p_delivery_id: entrega.id, p_success: true,
+    });
     expect(JSON.stringify(m.insert.mock.calls)).not.toContain(cadastro.senha);
     expect(JSON.stringify(m.rpc.mock.calls)).not.toContain(cadastro.senha);
   });
@@ -99,6 +113,11 @@ describe("serviço de contas", () => {
     await servico().alterar(alvo, { acao: "redefinir-senha", senha: cadastro.senha });
     expect(m.updateUserById).toHaveBeenCalledWith(alvo, { password: cadastro.senha, ban_duration: "none" });
     expect(m.updateUserById.mock.invocationCallOrder[0]).toBeLessThan(m.rpc.mock.invocationCallOrder[1]);
+    expect(m.rpc.mock.invocationCallOrder[1]).toBeLessThan(m.enviar.mock.invocationCallOrder[0]);
+    expect(m.enviar.mock.invocationCallOrder[0]).toBeLessThan(m.rpc.mock.invocationCallOrder[3]);
+    expect(m.rpc).toHaveBeenLastCalledWith("admin_finish_account_operation", {
+      p_actor_id: ator, p_operation_id: op, p_success: true,
+    });
     expect(JSON.stringify(m.rpc.mock.calls)).not.toContain(cadastro.senha);
   });
   it("preserva banimento de conta desativada ao redefinir senha", async () => {
@@ -127,5 +146,49 @@ describe("serviço de contas", () => {
     m.updateUserById.mockResolvedValue({ error: { status } });
     await expect(servico().alterar(alvo, { acao: "reativar" })).rejects.toMatchObject({ status: 502 });
     expect(m.rpc).toHaveBeenCalledTimes(1);
+  });
+  it.each(["cadastro", "redefinicao"])("sanitiza falha do provedor em %s e audita somente o resultado", async (fluxo) => {
+    const logs = ["log", "error", "warn", "info", "debug"] as const;
+    const spies = logs.map((nome) => vi.spyOn(console, nome).mockImplementation(() => undefined));
+    m.enviar.mockRejectedValue(new Error(`https://provedor.test/?token=${cadastro.senha}`));
+    const executar = fluxo === "cadastro" ? servico().cadastrar(cadastro)
+      : servico().alterar(alvo, { acao: "redefinir-senha", senha: cadastro.senha });
+    const erro = await executar.catch((e: Error) => e);
+    expect(erro).toMatchObject({ status: 502, codigo: "email-provedor" });
+    expect(String(erro)).not.toContain(cadastro.senha);
+    expect(m.rpc).toHaveBeenCalledWith("admin_finish_initial_email", {
+      p_actor_id: ator, p_delivery_id: entrega.id, p_success: false,
+    });
+    if (fluxo === "redefinicao") expect(m.rpc).toHaveBeenLastCalledWith("admin_finish_account_operation", {
+      p_actor_id: ator, p_operation_id: op, p_success: false,
+    });
+    expect(JSON.stringify([m.rpc.mock.calls, m.insert.mock.calls, ...spies.map((s) => s.mock.calls)]))
+      .not.toContain(cadastro.senha);
+    for (const spy of spies) expect(spy).not.toHaveBeenCalled();
+  });
+  it("não altera senha nem audita cadastro quando e-mail está sem configuração", async () => {
+    m.email.mockImplementation(() => { throw new Error("configuracao indisponivel"); });
+    await expect(servico().cadastrar(cadastro)).rejects.toThrow("configuracao indisponivel");
+    await expect(servico().alterar(alvo, { acao: "redefinir-senha", senha: cadastro.senha })).rejects.toThrow();
+    expect(m.createUser).not.toHaveBeenCalled(); expect(m.updateUserById).not.toHaveBeenCalled();
+    expect(m.rpc).not.toHaveBeenCalled(); expect(m.insert).not.toHaveBeenCalled();
+  });
+  it("não envia se o Auth ou o preparo auditado não confirmar", async () => {
+    m.updateUserById.mockResolvedValueOnce({ error: { status: 500 } });
+    await expect(servico().alterar(alvo, { acao: "redefinir-senha", senha: cadastro.senha })).rejects.toMatchObject({ status: 502 });
+    m.rpc.mockImplementationOnce(async () => ({ error: { code: "500" } }));
+    await expect(servico().cadastrar(cadastro)).rejects.toMatchObject({ status: 503 });
+    expect(m.enviar).not.toHaveBeenCalled();
+  });
+  it("retém reserva sem restaurar estado se a confirmação de entrega não for auditada", async () => {
+    m.rpc.mockImplementation(async (nome: string) => ({ data: nome === "admin_start_account_operation"
+      ? { operacao_id: op, conta } : entrega, error: nome === "admin_finish_initial_email" ? { code: "500" } : null }));
+    await expect(servico().alterar(alvo, { acao: "redefinir-senha", senha: cadastro.senha })).rejects.toMatchObject({ status: 503 });
+    expect(m.enviar).toHaveBeenCalledOnce();
+    expect(m.rpc.mock.calls.some(([nome]) => nome === "admin_finish_account_operation")).toBe(false);
+  });
+  it("bloquear, reativar e desativar não dependem do adaptador de e-mail", async () => {
+    for (const acao of ["bloquear", "reativar", "desativar"]) await servico().alterar(alvo, { acao });
+    expect(m.email).not.toHaveBeenCalled(); expect(m.enviar).not.toHaveBeenCalled();
   });
 });

@@ -40,3 +40,7 @@ O guard lança `ErroAdmin` com 401 para sessão ausente/vencida e 403 para funci
 
 O painel de contas está em `/admin` e `/admin/contas/[id]`. Contratos, auditoria, estados intermediários e recuperação de falhas estão em [contratos-admin.md](contratos-admin.md). As RPCs de gestão são exclusivas de `service_role`; nenhuma é liberada para `anon` ou `authenticated`.
 
+## Validade da credencial enviada por e-mail
+
+Cadastro/redefinição TI prepara e envia e-mail individual conforme [contratos-email-inicial.md](contratos-email-inicial.md). A credencial tem validade padrão de 24 horas (configurável entre 1 e 168), contada no banco a partir do preparo, e uso exclusivo para troca obrigatória. Entrega pendente, falha ou expirada nega autorização inclusive em sessões existentes; o trigger recusa troca direta no Auth nesses casos. Uma troca efetiva com credencial disponível consome a entrega e zera a marca, mantendo o logout/novo login existente. Operações administrativas reaplicam `must_change_password = true` **após** a alteração da senha no Auth e antes de enviar o e-mail. A reserva de redefinição permanece até confirmar o resultado auditado do envio.
+

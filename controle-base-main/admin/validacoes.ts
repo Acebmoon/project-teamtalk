@@ -1,5 +1,6 @@
 import type { AlteracaoConta, CadastroConta, FiltrosContas, StatusConta } from "./contratos";
 import { ErroAdmin } from "./erros";
+import { emailIndividual } from "../email/validacao";
 
 function invalido(mensagem: string): never {
   throw new ErroAdmin(400, "validacao", mensagem);
@@ -36,7 +37,7 @@ export function validarCadastro(entrada: unknown): CadastroConta {
   const email = texto(dados.email).toLowerCase();
   if (!nome || nome.length > 120 || /[\x00-\x1f\x7f]/.test(nome))
     return invalido("Informe um nome de até 120 caracteres.");
-  if (email.length > 254 || !/^[^\s@<>]+@[^\s@<>]+\.[^\s@<>]+$/.test(email))
+  if (!emailIndividual(email))
     return invalido("Informe um e-mail válido.");
   const papel = dados.papel ?? "employee";
   const status = dados.status ?? "pending";

@@ -161,3 +161,144 @@ describe("contratos SQL de contas e auditoria (PostgreSQL em memória)", () => {
     expect((await perfil()).status).toBe("active");
   });
 });
+
+async function prepararEmail(operacao: string | null = null, horas = 24) {
+  const linhaEntrega = await linha<{ entrega: { id: string; expires_at: string } }>(
+    "select public.admin_prepare_initial_email($1, $2, $3, $4) as entrega", [ator, alvo, operacao, horas]);
+  return linhaEntrega.entrega;
+}
+async function confirmarEmail(id: string, sucesso = true) {
+  return banco.query("select public.admin_finish_initial_email($1, $2, $3)", [ator, id, sucesso]);
+}
+async function estadoEntrega() {
+  return linha<{ state: string }>("select state from public.initial_access_deliveries where target_user_id = $1", [alvo]);
+}
+async function simularSenha(hash: string) {
+  return banco.query("update auth.users set encrypted_password = $2 where id = $1", [alvo, hash]);
+}
+async function cadastroPendente() {
+  await banco.query("update public.users set status = 'pending' where id = $1", [alvo]);
+  return prepararEmail();
+}
+async function permitirAlvo() {
+  await banco.query("select set_config('request.jwt.claim.sub', $1, false)", [alvo]);
+  await banco.query("update public.users set role = 'it_admin' where id = $1", [alvo]);
+}
+
+describe("SQL real de validade, uso inicial e auditoria sanitizada", () => {
+  it.each(["anon", "authenticated"])("%s não prepara/confirma entrega nem lê os metadados privados", async (papel) => {
+    await banco.exec(`set role ${papel}`);
+    try {
+      await expect(prepararEmail()).rejects.toMatchObject({ code: "42501" });
+      await expect(confirmarEmail(alvo)).rejects.toMatchObject({ code: "42501" });
+      await expect(banco.query("select * from public.initial_access_deliveries")).rejects.toMatchObject({ code: "42501" });
+      await expect(banco.query("select public.initial_access_allowed($1)", [alvo])).rejects.toMatchObject({ code: "42501" });
+    } finally { await banco.exec("reset role"); }
+  });
+  it("revalida Admin TI no banco sem confiar no actor_id fornecido", async () => {
+    await banco.query("update public.users set role = 'employee' where id = $1", [ator]);
+    await expect(cadastroPendente()).rejects.toMatchObject({ code: "42501" });
+    expect(await estadoEntrega()).toBeUndefined();
+  });
+  it("cadastro aguarda envio auditado com prazo padrão e mantém troca obrigatória", async () => {
+    await banco.query("update public.users set status = 'pending' where id = $1", [alvo]);
+    await banco.exec("set role service_role");
+    const entrega = await prepararEmail();
+    await banco.query("select public.admin_create_account($1, $2, 'it_admin', 'active')", [ator, alvo]);
+    await banco.exec("reset role");
+    await permitirAlvo();
+    expect(await perfil()).toEqual({ status: "active", must_change_password: true });
+    expect(await linha("select public.is_active_authorized_user() as autorizado")).toEqual({ autorizado: false });
+    const prazo = await linha<{ horas: number }>("select extract(epoch from expires_at - created_at)/3600 as horas from public.initial_access_deliveries");
+    expect(Number(prazo.horas)).toBe(24);
+    await banco.exec("set role service_role"); await confirmarEmail(entrega.id); await banco.exec("reset role");
+    expect(await estadoEntrega()).toEqual({ state: "sent" });
+    expect(await perfil()).toEqual({ status: "active", must_change_password: true });
+    expect(await linha("select public.get_access_state() as estado")).toEqual({ estado: { authorized: true, must_change_password: true, it_admin: false } });
+    const auditoria = await banco.query("select actor_id, target_user_id, action, details from public.audit_logs order by id");
+    expect(auditoria.rows).toContainEqual({ actor_id: ator, target_user_id: alvo, action: "initial_access.email_sent", details: { delivery_id: entrega.id } });
+    expect(JSON.stringify(auditoria.rows)).not.toMatch(/hash-anterior|"(?:password|token|senha)"\s*:|https?:/);
+    expect((await banco.query("select * from public.initial_access_deliveries")).rows[0])
+      .toEqual(expect.objectContaining({ target_user_id: alvo, actor_id: ator, state: "sent" }));
+  });
+  it.each(["pending", "active", "blocked", "disabled"])("redefinição em %s repõe a marca APÓS o trigger e antes do e-mail", async (status) => {
+    await banco.query("update public.users set status = $2 where id = $1", [alvo, status]);
+    const operacao = await iniciar("redefinir-senha");
+    await simularSenha("hash-temporario-EMAIL-83");
+    expect(await perfil()).toEqual({ status: "blocked", must_change_password: false });
+    const entrega = await prepararEmail(operacao);
+    expect(await perfil()).toEqual({ status: "blocked", must_change_password: true });
+    await expect(finalizar(operacao)).rejects.toMatchObject({ code: "55P03" });
+    await confirmarEmail(entrega.id); await finalizar(operacao);
+    expect(await perfil()).toEqual({ status, must_change_password: true });
+    const auditoria = await banco.query("select * from public.audit_logs");
+    expect(JSON.stringify(auditoria.rows)).not.toContain("hash-temporario-EMAIL-83");
+  });
+  it("expiração nega RLS e troca direta no Auth inclusive com sessão já emitida", async () => {
+    const entrega = await cadastroPendente();
+    await banco.query("select public.admin_create_account($1, $2, 'it_admin', 'active')", [ator, alvo]);
+    await confirmarEmail(entrega.id); await permitirAlvo();
+    await banco.query("update public.initial_access_deliveries set expires_at = now() - interval '1 second'");
+    expect(await linha("select public.get_access_state() as estado")).toEqual({ estado: { authorized: false, must_change_password: true, it_admin: false } });
+    await expect(simularSenha("hash-apos-expiracao")).rejects.toMatchObject({ code: "42501" });
+    expect((await perfil()).must_change_password).toBe(true);
+    expect(await estadoEntrega()).toEqual({ state: "sent" });
+  });
+  it("consome a credencial apenas na troca definitiva e libera chat; expiração posterior não revoga a senha nova", async () => {
+    const entrega = await cadastroPendente();
+    await banco.query("select public.admin_create_account($1, $2, 'it_admin', 'active')", [ator, alvo]);
+    await confirmarEmail(entrega.id); await permitirAlvo();
+    const conversa = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    await banco.query("insert into public.conversations(id, type) values($1, 'direct')", [conversa]);
+    await banco.query("insert into public.conversation_participants(conversation_id, user_id) values($1, $2)", [conversa, alvo]);
+    expect(await linha("select public.can_access_conversation($1) as chat", [conversa])).toEqual({ chat: false });
+    await simularSenha("hash-definitivo");
+    expect(await estadoEntrega()).toEqual({ state: "used" }); expect((await perfil()).must_change_password).toBe(false);
+    expect(await linha("select public.can_access_conversation($1) as chat", [conversa])).toEqual({ chat: true });
+    await banco.query("update public.initial_access_deliveries set expires_at = now() - interval '1 day'");
+    await simularSenha("hash-definitivo-seguinte");
+    expect(await linha("select public.is_active_authorized_user() as autorizado")).toEqual({ autorizado: true });
+  });
+  it("falha do provedor permanece sem acesso, impede troca direta e permite nova redefinição TI", async () => {
+    const operacao = await iniciar("redefinir-senha"); await simularSenha("hash-email-falhou");
+    const entrega = await prepararEmail(operacao); await confirmarEmail(entrega.id, false); await finalizar(operacao, false);
+    await permitirAlvo();
+    expect(await perfil()).toEqual({ status: "blocked", must_change_password: true });
+    expect(await estadoEntrega()).toEqual({ state: "failed" });
+    await expect(simularSenha("hash-nao-autorizado")).rejects.toMatchObject({ code: "42501" });
+    const novaOperacao = await iniciar("redefinir-senha"); await simularSenha("hash-tentativa-nova");
+    const novaEntrega = await prepararEmail(novaOperacao);
+    expect(novaEntrega.id).not.toBe(entrega.id);
+    await expect(confirmarEmail(entrega.id)).rejects.toMatchObject({ code: "P0002" });
+    await confirmarEmail(novaEntrega.id); await finalizar(novaOperacao);
+    expect((await perfil()).must_change_password).toBe(true);
+  });
+  it("entrega pendente impede reativação/reenvio concorrente e troca direta da senha", async () => {
+    await cadastroPendente();
+    await expect(iniciar("reativar")).rejects.toMatchObject({ code: "55P03" });
+    await expect(prepararEmail()).rejects.toMatchObject({ code: "55P03" });
+    await expect(simularSenha("hash-durante-envio")).rejects.toMatchObject({ code: "42501" });
+  });
+  it.each([0, 169, 1.5, null])("recusa validade fora da política também no banco: %s", async (horas) => {
+    await banco.query("update public.users set status = 'pending' where id = $1", [alvo]);
+    await expect(banco.query("select public.admin_prepare_initial_email($1, $2, null, $3)", [ator, alvo, horas])).rejects.toThrow();
+    expect(await estadoEntrega()).toBeUndefined();
+  });
+  it("auditoria de entrega e liberação são atômicas: erro retém bloqueio e reserva", async () => {
+    const operacao = await iniciar("redefinir-senha"); await simularSenha("hash-novo");
+    const entrega = await prepararEmail(operacao);
+    await banco.exec(`create function public.email_test_audit_failure() returns trigger language plpgsql as $$
+      begin raise exception 'audit unavailable'; end; $$;
+      create trigger email_test_audit_failure before insert on public.audit_logs
+      for each row execute function public.email_test_audit_failure();`);
+    try {
+      await expect(confirmarEmail(entrega.id)).rejects.toThrow("audit unavailable");
+      expect(await estadoEntrega()).toEqual({ state: "pending" });
+      expect(await perfil()).toEqual({ status: "blocked", must_change_password: true });
+      expect((await banco.query("select * from public.admin_account_operations")).rows).toHaveLength(1);
+    } finally {
+      await banco.exec("drop trigger email_test_audit_failure on public.audit_logs; drop function public.email_test_audit_failure();");
+    }
+    await confirmarEmail(entrega.id); await finalizar(operacao);
+  });
+});
