@@ -21,6 +21,16 @@ O middleware verifica o aparelho **antes** de consultar o Supabase. Se houver `S
 
 A identificação é uma **restrição de uso**, não um mecanismo de segurança infalível: quem falsifica User-Agent e Client Hints pode passar. Os dados são protegidos por autenticação, sessão, RBAC server-side e RLS no banco.
 
+## Grupos e auditoria
+
+O guard lança `ErroAdmin` com 401 para sessão ausente/vencida e 403 para funcionário, conta negada ou troca pendente. Os handlers convertem essas falhas em JSON sem cache mesmo quando chamados diretamente, sem middleware. Server actions devolvem estado com `status` e mensagem segura; nenhuma operação é executada após a negação.
+
+As páginas de grupos e auditoria e o layout administrativo chamam primeiro o guard. Sessão ausente/vencida vai para `/login`; funcionário recebe 403, inclusive no middleware de `/admin/**`. A defesa das páginas usa `forbidden()` com `experimental.authInterrupts` habilitado no Next.js. O carregador da página inicial de TI também inicia pelo guard.
+
+As telas `/admin/grupos`, `/admin/grupos/[id]` e `/admin/auditoria` e as APIs correspondentes seguem [contratos-grupos-auditoria.md](contratos-grupos-auditoria.md). Leituras usam o cliente da sessão e RLS. Mutações usam uma RPC exclusiva de `service_role`, após o guard, que revalida o ator e grava a alteração e sua auditoria na mesma transação.
+
+`is_active_authorized_user()` mantém o contrato existente: funcionário precisa de `status = active` e participação em ao menos um grupo habilitado. Desabilitar o último grupo ou remover a última participação revoga acesso nas próximas consultas, inclusive com sessão já aberta. Participar não ativa contas, não troca senhas e não altera a autorização de conversas. Admin TI mantém a exceção para administrar a implantação sem grupo; conteúdo de chat continua exigindo participação e senha já trocada.
+
 ## Admin TI
 A mesma RPC `get_access_state()` devolve `it_admin`, calculado por `is_active_it_admin()`. `decidirRota()` restringe `/admin/**` e devolve JSON `{ erro }` com 401 para sessão ausente/vencida ou 403 para conta negada, troca pendente e funcionário em `/api/admin/**`. O filtro de dispositivo roda antes da decisão de API e devolve 403 JSON para aparelho bloqueado em todos os métodos, inclusive GET e HEAD.
 

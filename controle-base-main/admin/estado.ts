@@ -7,3 +7,4 @@ export async function GET() {
     return respostaAdmin({ papel: "it_admin" });
   } catch (erro) { return respostaErroAdmin(erro); }
 }
+

@@ -2,7 +2,7 @@ import path from "node:path";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  experimental: { externalDir: true },
+  experimental: { externalDir: true, authInterrupts: true },
   outputFileTracingRoot: path.resolve(__dirname, ".."),
   async headers() {
     return [
@@ -20,3 +20,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
