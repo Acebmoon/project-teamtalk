@@ -27,6 +27,7 @@
     "**/*.ts",
     "**/*.tsx",
     "../controle-base-main/**/*.ts",
+    "../design-em-react/**/*.ts",
     "../design-em-react/**/*.tsx"
   ],
   "exclude": ["node_modules"]
