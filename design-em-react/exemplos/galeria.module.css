@@ -1,0 +1,5 @@
+.galeria { display: grid; gap: var(--espaco-4); width: 100%; max-width: var(--largura-leitura); margin: 0 auto; }
+.secao { display: grid; min-width: 0; gap: var(--espaco-4); padding: var(--espaco-4); border: var(--borda-fina) solid var(--cor-borda); border-radius: var(--raio-md); background: var(--cor-superficie); }
+.secao h2 { margin: 0; font-size: var(--fonte-lg); line-height: var(--linha-titulo); }
+.secao p { margin: 0; color: var(--cor-secundaria); font-size: var(--fonte-base); line-height: var(--linha-texto); }
+.linha { display: flex; flex-wrap: wrap; align-items: center; gap: var(--espaco-2); min-width: 0; }

@@ -1,5 +1,9 @@
 # project-teamtalk
 
+## MVP integrado
+
+A rota autenticada `/` abre a Inbox conectada a conversas, mensagens, recibos e PDF. O painel TI inclui contas, liberação gradual e auditoria. Veja o [guia de integração](docs/integracao-mvp.md) para as entregas, a ordem das migrations e a validação; QA e homologação real seguem nas Issues #85–#88.
+
 ## Visão geral
 
 Aplicativo Web de Comunicação Interna corporativa, com experiência mobile-first inspirada em aplicativos de mensagens e identidade visual da empresa. O acesso do MVP é exclusivo pelo navegador do celular, por link direto, com suporte planejado a Chrome no Android e Safari no iOS. O acesso por computadores e notebooks deve ser bloqueado tecnicamente.
@@ -25,8 +29,10 @@ A estimativa de escala é de aproximadamente **900 funcionários**. A Fase 1 ser
 
 ## Documentação do projeto
 
+- [Especificação integrada do TeamTalk: índice, casos de uso, arquitetura, dados, diagramas e rastreabilidade](docs/README.md)
 - [Documento de Especificação de Requisitos (versão atualmente presente na branch main)](docs/Documento-de-Requisitos.md)
 - [Divisão completa de tarefas, stack, estrutura, Issues, dependências e matriz de rastreabilidade](DIVISAO_TAREFAS.md)
+- [Homologação Vercel + Supabase: configuração, migrations, smoke com duas contas e reversão](docs/homologacao-vercel-supabase.md)
 
 **Nota sobre o arquivo DOCX:** a listagem recursiva da branch main consultada durante esta atualização não contém o arquivo `Documento_de_Requisitos_Aplicativo_Comunicacao_Interna.docx`. Para não criar um link quebrado nem substituir qualquer documento, o README aponta para a versão de requisitos que está efetivamente versionada em `docs/Documento-de-Requisitos.md`. O DOCX não foi alterado.
 

@@ -10,15 +10,19 @@ Na raiz do repositório existem três pastas com responsabilidades separadas:
 
 `base(tempval)/tsconfig.json` expõe os aliases `@controle/*` e `@design/*`; `next.config.ts` habilita o acesso ao diretório externo e rastreia os arquivos a partir da raiz. O `package.json` da raiz usa npm workspaces.
 
+## Homologação e reversão
+
+O [guia Vercel + Supabase](../docs/homologacao-vercel-supabase.md) registra configuração de Preview/HTTPS, variáveis privadas, migrations, testes com duas contas e recuperação. Executar `npm run build:homologacao` neste workspace para os gates de typecheck, lint, testes e build; a instalação usa `npm ci` na raiz. Projeto, domínio e credenciais de homologação devem ser definidos pela equipe antes da implantação remota.
+
 ## Requisitos
 
-Node.js 20.9+, npm e Docker (Supabase local).
+Node.js 24.x (`.nvmrc`), npm 11.19.1 (`packageManager` da raiz) e Docker (Supabase local).
 
 ## Instalação e execução
 
 ```sh
 # A partir da raiz do repositório
-npm install
+npm ci
 cd 'base(tempval)'
 cp .env.example .env.local
 npx supabase start

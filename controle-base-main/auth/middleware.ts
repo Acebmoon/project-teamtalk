@@ -30,7 +30,10 @@ export async function middleware(requisicao: NextRequest) {
 
   const resposta = plano.tipo === "redirecionar"
     ? NextResponse.redirect(new URL(plano.caminho, requisicao.url), plano.codigo)
-    : NextResponse.json({ erro: plano.erro }, { status: plano.codigo });
+    : plano.tipo === "erro-pagina"
+      ? new NextResponse(plano.erro, { status: plano.codigo, headers: { "Cache-Control": "no-store" } })
+      : NextResponse.json({ erro: plano.erro }, { status: plano.codigo });
   contexto.resposta.cookies.getAll().forEach((cookie) => resposta.cookies.set(cookie));
   return resposta;
 }
+

@@ -21,7 +21,26 @@ O middleware verifica o aparelho **antes** de consultar o Supabase. Se houver `S
 
 A identificação é uma **restrição de uso**, não um mecanismo de segurança infalível: quem falsifica User-Agent e Client Hints pode passar. Os dados são protegidos por autenticação, sessão, RBAC server-side e RLS no banco.
 
+## Grupos e auditoria
+
+O guard lança `ErroAdmin` com 401 para sessão ausente/vencida e 403 para funcionário, conta negada ou troca pendente. Os handlers convertem essas falhas em JSON sem cache mesmo quando chamados diretamente, sem middleware. Server actions devolvem estado com `status` e mensagem segura; nenhuma operação é executada após a negação.
+
+As páginas de grupos e auditoria e o layout administrativo chamam primeiro o guard. Sessão ausente/vencida vai para `/login`; funcionário recebe 403, inclusive no middleware de `/admin/**`. A defesa das páginas usa `forbidden()` com `experimental.authInterrupts` habilitado no Next.js. O carregador da página inicial de TI também inicia pelo guard.
+
+As telas `/admin/grupos`, `/admin/grupos/[id]` e `/admin/auditoria` e as APIs correspondentes seguem [contratos-grupos-auditoria.md](contratos-grupos-auditoria.md). Leituras usam o cliente da sessão e RLS. Mutações usam uma RPC exclusiva de `service_role`, após o guard, que revalida o ator e grava a alteração e sua auditoria na mesma transação.
+
+`is_active_authorized_user()` mantém o contrato existente: funcionário precisa de `status = active` e participação em ao menos um grupo habilitado. Desabilitar o último grupo ou remover a última participação revoga acesso nas próximas consultas, inclusive com sessão já aberta. Participar não ativa contas, não troca senhas e não altera a autorização de conversas. Admin TI mantém a exceção para administrar a implantação sem grupo; conteúdo de chat continua exigindo participação e senha já trocada.
+
 ## Admin TI
 A mesma RPC `get_access_state()` devolve `it_admin`, calculado por `is_active_it_admin()`. `decidirRota()` restringe `/admin/**` e devolve JSON `{ erro }` com 401 para sessão ausente/vencida ou 403 para conta negada, troca pendente e funcionário em `/api/admin/**`. O filtro de dispositivo roda antes da decisão de API e devolve 403 JSON para aparelho bloqueado em todos os métodos, inclusive GET e HEAD.
 
 **Cada página, server action e rota de API administrativa deve chamar `exigirAdminTI()` antes de qualquer operação.** O middleware não protege sozinho server actions, que podem ser invocadas por POST em outras URLs. A função retorna `{ supabase, usuario }` apenas para sessão válida e admin autorizado, após troca da senha provisória. A chave `service_role` permanece **somente no servidor**, jamais com `NEXT_PUBLIC_`, e só pode ser usada depois de `exigirAdminTI()`. O endpoint de teste `GET /api/admin/estado` devolve `{ "papel": "it_admin" }` para TI; funcionário recebe 403.
+
+O guard lança `ErroAdmin` com 401 para sessão ausente/vencida e 403 para funcionário, conta negada ou troca pendente. Os handlers administrativos convertem isso em JSON sem expor erros internos, mesmo sem executar o middleware. Páginas encaminham sessão ausente ao login e negam falta de permissão com `forbidden()` (403); server actions retornam uma mensagem segura e não executam a operação. A composição das páginas delega primeiro ao carregador protegido em `controle-base-main/admin/painel.ts`.
+
+O painel de contas está em `/admin` e `/admin/contas/[id]`. Contratos, auditoria, estados intermediários e recuperação de falhas estão em [contratos-admin.md](contratos-admin.md). As RPCs de gestão são exclusivas de `service_role`; nenhuma é liberada para `anon` ou `authenticated`.
+
+## Validade da credencial enviada por e-mail
+
+Cadastro/redefinição TI prepara e envia e-mail individual conforme [contratos-email-inicial.md](contratos-email-inicial.md). A credencial tem validade padrão de 24 horas (configurável entre 1 e 168), contada no banco a partir do preparo, e uso exclusivo para troca obrigatória. Entrega pendente, falha ou expirada nega autorização inclusive em sessões existentes; o trigger recusa troca direta no Auth nesses casos. Uma troca efetiva com credencial disponível consome a entrega e zera a marca, mantendo o logout/novo login existente. Operações administrativas reaplicam `must_change_password = true` **após** a alteração da senha no Auth e antes de enviar o e-mail. A reserva de redefinição permanece até confirmar o resultado auditado do envio.
+

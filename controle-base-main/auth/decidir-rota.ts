@@ -3,7 +3,8 @@ import type { DecisaoAcesso } from "./decidir-acesso";
 export type ResultadoRota =
   | { tipo: "seguir"; encerrarSessao?: boolean }
   | { tipo: "redirecionar"; caminho: string; codigo: 303 | 307; encerrarSessao?: boolean }
-  | { tipo: "erro-api"; codigo: 401 | 403; erro: string; encerrarSessao?: boolean };
+  | { tipo: "erro-api"; codigo: 401 | 403; erro: string; encerrarSessao?: boolean }
+  | { tipo: "erro-pagina"; codigo: 403; erro: string; encerrarSessao?: boolean };
 
 export function decidirRota(
   rota: string, metodo: string, decisao: DecisaoAcesso, ehAdmin: boolean,
@@ -38,6 +39,7 @@ export function decidirRota(
     return rota === "/primeiro-acesso" ? { tipo: "seguir" } : redirecionar("/primeiro-acesso");
 
   if (rota === "/login" || rota === "/primeiro-acesso") return redirecionar("/");
-  if (admin && !ehAdmin) return redirecionar("/");
+  if (admin && !ehAdmin) return { tipo: "erro-pagina", codigo: 403, erro: "Área restrita à TI." };
   return { tipo: "seguir" };
 }
+

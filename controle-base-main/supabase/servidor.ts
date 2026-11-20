@@ -1,14 +1,13 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const chave = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const opcoes = { secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/" };
+import { obterAmbienteServidor } from "../configuracao/servidor";
 
 export async function criarServidor() {
+  const { supabaseUrl, supabaseAnonKey } = obterAmbienteServidor();
+  const opcoes = { secure: process.env.NODE_ENV === "production", sameSite: "lax" as const, path: "/" };
   const armazenamento = await cookies();
 
-  return createServerClient(url, chave, {
+  return createServerClient(supabaseUrl, supabaseAnonKey, {
     cookieOptions: opcoes,
     cookies: {
       getAll: () => armazenamento.getAll(),

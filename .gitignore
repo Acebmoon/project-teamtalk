@@ -145,5 +145,15 @@ vite.config.ts.timestamp-*
 # Astro generated types
 .astro/
 
+# Evidências locais dos testes de navegador
+test-results/
+playwright-report/
+
 # Turbo Repo
 .turbo
+
+# Vercel local (vínculo do projeto e variáveis baixadas)
+.vercel/
+# Estado/credenciais da CLI Supabase
+**/supabase/.temp/
+**/supabase/.branches/

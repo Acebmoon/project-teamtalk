@@ -1,0 +1,17 @@
+.liberacao-nav { display: flex; flex-wrap: wrap; gap: 8px 20px; padding: 12px 20px; border-bottom: 1px solid var(--cor-borda); background: white; }
+.liberacao-nav a, .liberacao a { display: inline-flex; align-items: center; min-height: 48px; color: var(--cor-primaria); }
+.liberacao { width: min(100%, 860px); margin: 0 auto; padding: 24px 16px; overflow-wrap: anywhere; }
+.liberacao h1 { margin-top: 16px; }
+.liberacao h2 { font-size: 22px; }
+.liberacao-bloco { margin: 20px 0; padding: 20px; border: 1px solid var(--cor-borda); border-radius: 12px; background: white; }
+.liberacao select { width: 100%; min-height: 48px; padding: 10px; border: 1px solid var(--cor-borda); border-radius: 8px; background: white; font: inherit; }
+.liberacao button:disabled { opacity: .6; cursor: wait; }
+.liberacao-lista { padding: 0; margin: 20px 0; list-style: none; }
+.liberacao-lista li { padding: 16px 0; border-top: 1px solid var(--cor-borda); }
+.liberacao-lista h3 { margin: 0; font-size: 18px; }
+.liberacao-lista p { margin: 8px 0; }
+.liberacao-paginacao { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+.liberacao dt { font-weight: bold; }
+.liberacao dd { margin: 4px 0 12px; }
+.liberacao summary { min-height: 48px; padding: 14px 0; cursor: pointer; }
+.liberacao pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 13px; }

@@ -1,22 +1,24 @@
 import path from "node:path";
 import type { NextConfig } from "next";
+import { validarAmbienteServidor } from "../controle-base-main/configuracao/ambiente";
+import { headersSeguranca } from "../controle-base-main/configuracao/headers";
+
+// Next carrega .env* antes desta configuração. Falha antes de gerar um bundle inseguro.
+validarAmbienteServidor(process.env);
 
 const nextConfig: NextConfig = {
-  experimental: { externalDir: true },
+  experimental: { externalDir: true, authInterrupts: true },
   outputFileTracingRoot: path.resolve(__dirname, ".."),
+  poweredByHeader: false,
   async headers() {
     return [
       {
         source: "/:path*",
-        headers: [
-          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          { key: "X-Frame-Options", value: "DENY" },
-          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-        ],
+        headers: headersSeguranca(process.env.NODE_ENV === "production"),
       },
     ];
   },
 };
 
 export default nextConfig;
+
