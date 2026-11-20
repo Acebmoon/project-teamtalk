@@ -13,6 +13,9 @@ export default defineConfig({
     maxWorkers: 2,
     setupFiles: ["./controle-base-main/testes/preparar-vitest.ts"],
     env: {
+      // O runner de testes usa React de teste e configuração local, mesmo no build Vercel.
+      NODE_ENV: "test",
+      VERCEL: "0",
       NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "sb_publishable_teamtalk_test",
     },
