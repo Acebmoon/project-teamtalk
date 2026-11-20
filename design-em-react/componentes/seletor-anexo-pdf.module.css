@@ -1,0 +1,74 @@
+.seletor {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--cor-borda);
+  border-radius: 12px;
+  background: var(--cor-superficie);
+  color: var(--cor-texto);
+}
+
+.seletor .ajuda,
+.seletor .erro {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.arquivo {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.nome { font-weight: 700; overflow-wrap: anywhere; }
+.tamanho { color: var(--cor-secundaria); }
+.acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.seletor .controle,
+.seletor .remover {
+  position: relative;
+  display: flex;
+  flex: 1 1 130px;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 0;
+  min-height: 48px;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--cor-primaria);
+  border-radius: 8px;
+  background: var(--cor-primaria);
+  color: white;
+  font: inherit;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
+.seletor .remover { background: var(--cor-superficie); color: var(--cor-primaria); }
+.controle:hover { background: var(--cor-primaria-hover); }
+.seletor .remover:hover { background: var(--cor-fundo); }
+.controle:focus-within { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
+
+.seletor .entrada {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  min-height: 0;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.controle[data-desabilitado="true"],
+.seletor .remover:disabled { opacity: .6; cursor: not-allowed; }
+.seletor .erro { color: var(--cor-erro); }
