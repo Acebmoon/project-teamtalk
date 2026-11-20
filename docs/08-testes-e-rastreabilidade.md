@@ -12,7 +12,7 @@ O [README](../README.md) contém instalação, execução e ambiente; o [guia de
 
 | Origem | Resultado verificado | Alcance |
 |---|---|---|
-| [CI final do #110](https://github.com/Acebmoon/project-teamtalk/actions/runs/44663257450), head `fa37f258250439c349178ef5f60cdca165d8a1e7` incorporado à main | **936 testes em 47 arquivos**, typecheck, lint e build aprovados | Unitários, contratos, composição com transporte simulado e SQL/RLS em PGlite com as migrations reais. |
+| [CI da main pós-#110](https://github.com/Acebmoon/project-teamtalk/actions/runs/44664059549), commit `9bcf20571a2b29605caab2b6e92f3f4d69f82990` | **936 testes em 47 arquivos**, typecheck, lint e build aprovados | Unitários, contratos, composição com transporte simulado e SQL/RLS em PGlite com as migrations reais. |
 | Mesma execução CI | **12 testes mobile aprovados** | Galeria de componentes em Chromium com perfil Android e WebKit com perfil iPhone; não é E2E autenticado. |
 | [Relatório de integração](integracao-mvp.md) e [PR #110](https://github.com/Acebmoon/project-teamtalk/pull/110) | **49 checks HTTP locais aprovados** | Sessão, dispositivo, redirecionamentos e headers no build; o workflow atual não possui etapa própria para esses 49 checks. |
 | QA em campo #85–#88 | **PENDENTE** | HTTPS/provedor/GoTrue/Storage/Realtime reais, duas contas, smartphones físicos, desktop, carga e operação. |

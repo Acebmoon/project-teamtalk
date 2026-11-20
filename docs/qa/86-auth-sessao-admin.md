@@ -8,7 +8,7 @@ Referência: `main` pós-PR #110, merge `9bcf20571a2b29605caab2b6e92f3f4d69f8299
 
 | Evidência | Resultado registrado | Fonte / limite |
 |---|---|---|
-| CI: typecheck, lint, build e Vitest | APROVADO — **936 testes em 47 arquivos** | [Execução de integração](https://github.com/Acebmoon/project-teamtalk/actions/runs/44663257450). SQL/RLS em PGlite; serviços externos simulados. |
+| CI: typecheck, lint, build e Vitest | APROVADO — **936 testes em 47 arquivos** | [Execução da main](https://github.com/Acebmoon/project-teamtalk/actions/runs/44664059549). SQL/RLS em PGlite; serviços externos simulados. |
 | CI mobile | APROVADO — **12 testes** | Mesma execução; galeria de componentes em Chromium/Android e WebKit/iPhone. Não é E2E autenticado nem aparelho físico. |
 | Smoke HTTP do build integrado | APROVADO — **49 checks HTTP** | [PR #110](https://github.com/Acebmoon/project-teamtalk/pull/110) e [relatório](../integracao-mvp.md). Execução local de sessão/dispositivo/headers, não etapa HTTP própria do workflow. |
 

@@ -93,7 +93,7 @@ Somente as duas variáveis `NEXT_PUBLIC_SUPABASE_*` da tabela são destinadas ao
 
 | Evidência incorporada à main | Resultado | Fonte e alcance |
 |---|---|---|
-| CI do head final de integração | **936 testes**, 47 arquivos; typecheck, lint e build aprovados | [GitHub Actions #110](https://github.com/Acebmoon/project-teamtalk/actions/runs/44663257450); inclui SQL/RLS com migrations reais em PGlite e transportes externos simulados. |
+| CI da main pós-#110 | **936 testes**, 47 arquivos; typecheck, lint e build aprovados | [GitHub Actions da main](https://github.com/Acebmoon/project-teamtalk/actions/runs/44664059549); inclui SQL/RLS com migrations reais em PGlite e transportes externos simulados. |
 | CI mobile | **12 testes aprovados** | Mesma execução; Chromium/Android e WebKit/iPhone sobre a galeria de componentes, sem autenticação real. |
 | Smoke HTTP da integração | **49 verificações aprovadas** | [Registro do #110](https://github.com/Acebmoon/project-teamtalk/pull/110) e [relatório](docs/integracao-mvp.md): sessão/dispositivo/redirecionamentos/headers no build local. Não é uma etapa HTTP separada do workflow atual. |
 
